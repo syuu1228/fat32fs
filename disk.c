@@ -1,5 +1,9 @@
 #include "message.h"
 #include <fcntl.h>
+#include <stdlib.h>
+#include <sys/types.h>
+#include <unistd.h>
+
 #define DISK_FILE_NAME "fat32test.img"
 
 int disk_read(int id, void *buf, unsigned offset, int count)

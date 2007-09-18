@@ -1,7 +1,8 @@
 #define DISK_ID 0
 #define PARTITION_NO 0
-#include "fat_dir.h"
-#include "fat_file.h"
+#include "vfs.h"
+#include "fat32/fat_dir.h"
+#include "fat32/fat_file.h"
 
 static fat_instance *ins;
 
