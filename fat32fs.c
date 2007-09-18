@@ -1,5 +1,7 @@
 #define DISK_ID 0
 #define PARTITION_NO 0
+#include "fat_dir.h"
+#include "fat_file.h"
 
 static fat_instance *ins;
 
@@ -18,40 +20,64 @@ static int fat32fs_getattr(const char *path, stat *stbuf)
     return 0;
 }
 
-static int fat32fs_opendir(const char *name)
+static int fat32fs_opendir(vfs_fd *vfd, const char *name)
 {
-    return NULL;
-}
-
-
-static dirent *fat32fs_readdir(int fd)
-{
-    return NULL;
-}
-
-static int fat32fs_closedir(int fd)
-{
+	fat_dir *dir = fat_dir_open(ins, name);
+	if(!dir)
+		return -1;
+	vfd->private_data = (void *)dir;
     return 0;
 }
 
-static int fat32fs_open(const char *pathname, int flags, mode_t mode)
+
+static dirent *fat32fs_readdir(vfs_fd *vfd)
 {
+	static dirent;
+    fat_dir_content content;
+    
+	if(!vfd->private_data)
+		return -1;
+    if(!fat_dir_read((fat_dir *)vfd_private_data, &content))
+    	return -1;
+    memset(&dirent, 0, sizeof(dirent));
+    return &dirent;
+}
+
+static int fat32fs_closedir(vfs_fd *vfd)
+{
+	if(!vfd->private_data)
+		return -1;
+	return fat_dir_close((fat_dir *)vfd->private_data);
+}
+
+static int fat32fs_open(vfs_fd *vfd, const char *path, int flags, mode_t mode)
+{
+	fat_file *file = fat_file_open(ins, path);
+	if(!file)
+		return -1;
+	vfd->private_data = (void *)file;
     return 0;
 }
 
-static ssize_t fat32fs_read(int fd, void *buf, size_t count)
+static ssize_t fat32fs_read(vfs_fd *vfd, void *buf, size_t count)
 {
-	return 0;
+	if(!vfd->private_data)
+		return -1;
+	return fat_file_read((fat_file *)vfd_private_data, buf, count);
 }
 
-static off_t fat32fs_lseek(int fildes, off_t offset, int whence)
+static off_t fat32fs_lseek(vfs_fd *vfd, off_t offset, int whence)
 {
-	return 0;
+	if(!vfd->private_data)
+		return -1;
+	return fat_file_seek((fat_file *)vfd_private_data, offset);
 }
 
-static int fat32fs_close(int fd)
+static int fat32fs_close(vfs_fd *vfd)
 {
-    return 0;
+	if(!vfd->private_data)
+		return -1;
+	return fat_file_close((fat_file *)vfd_private_data);
 }
 
 static vfs_operations fat32fs_oper = {

@@ -22,6 +22,18 @@ void list_insert_after(list_node * list, list_node * node)
 	list->next = node;
 }
 
+void list_insert_head (list_node *list, list_node *node)
+{
+	MESSAGE_DEBUG("list:%p node:%p\n", list, node);
+	list_insert_after(list_head(list), node);
+}
+
+void list_insert_tail (list_node *list, list_node *node)
+{
+	MESSAGE_DEBUG("list:%p node:%p\n", list, node);
+	list_insert_after(list_tail(list), node);
+}
+
 void list_delete(list_node * node)
 {
 	MESSAGE_DEBUG("node:%p\n", node);
@@ -45,6 +57,20 @@ void list_move_after(list_node * list, list_node * node)
 	MESSAGE_DEBUG("list:%p node:%p\n", list, node);
 	list_delete (node);
 	list_insert_after (list, node);
+}
+
+void list_move_head (list_node *list, list_node *node)
+{
+	MESSAGE_DEBUG("list:%p node:%p\n", list, node);
+	list_delete (node);
+	list_insert_head (list, node);
+}
+
+void list_move_tail (list_node *list, list_node *node)
+{
+	MESSAGE_DEBUG("list:%p node:%p\n", list, node);
+	list_delete (node);
+	list_insert_tail (list, node);
 }
 
 list_node *list_tail(list_node * node)

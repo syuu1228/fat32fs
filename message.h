@@ -1,7 +1,7 @@
 #ifndef MESSAGE_H_
 #define MESSAGE_H_
-#include "string.h"
-#include "compatibility.h"
+#include "./string.h"
+#include <stdio.h>
 
 #ifdef DEBUG	
 #define MESSAGE_DEBUG \

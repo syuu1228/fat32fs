@@ -11,9 +11,13 @@ typedef struct _list_node
 #define LIST_FOR_EACH_REVERSE(node) for(; node; node = node->prev)
 void list_insert_before (list_node * list, list_node * node);
 void list_insert_after (list_node * list, list_node * node);
+void list_insert_head (list_node *list, list_node *node);
+void list_insert_tail (list_node *list, list_node *node);
 void list_delete (list_node * node);
 void list_move_before (list_node * list, list_node * node);
 void list_move_after (list_node * list, list_node * node);
+void list_move_head (list_node *list, list_node *node);
+void list_move_tail (list_node *list, list_node *node);
 list_node *list_head (list_node * node);
 list_node *list_tail (list_node * node);
 void list_node_copy (list_node * dest, list_node * src);

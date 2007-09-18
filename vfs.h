@@ -1,6 +1,7 @@
 #ifndef VFS_H_
 #define VFS_H_
-#define FD_TABLE_SIZE 1024
+#include "vfs_fd.h"
+
 typedef struct
 {
 	int disk_id, partition_no;
@@ -11,13 +12,13 @@ typedef struct
 {
 	int (*init)(vfs_config *conf);
 	int (*getattr)(const char *path, stat *stbuf);
-	int (*opendir)(const char *name);
-	dirent *(*readdir)(int fd);
-	int (*closedir)(int fd);
-	int (*open)(const char *pathname, int flags, mode_t mode);
-	ssize_t (*read)(int fd, void *buf, size_t count);
-	off_t (*lseek)(int fd, off_t offset, int whence);
-	int (*close)(int fd);
+	int (*opendir)(vfs_fd *vfd, const char *name);
+	dirent *(*readdir)(vfs_fd *vfd);
+	int (*closedir)(vfs_fd *vfd);
+	int (*open)(vfs_fd *vfd, const char *path, int flags, mode_t mode);
+	ssize_t (*read)(vfs_fd *vfd, void *buf, size_t count);
+	off_t (*lseek)(vfs_fd *vfd, off_t offset, int whence);
+	int (*close)(vfs_fd *vfd);
 } vfs_operations;
 
 typedef struct 
@@ -55,7 +56,7 @@ int vfs_getattr(const char *path, stat *stbuf);
 int vfs_opendir(const char *name);
 dirent *vfs_readdir(int fd);
 int vfs_closedir(int fd);
-int vfs_open(const char *pathname, int flags, mode_t mode);
+int vfs_open(const char *path, int flags, mode_t mode);
 ssize_t vfs_read(int fd, void *buf, size_t count);
 off_t vfs_lseek(int fd, off_t offset, int whence);
 int vfs_close(int fd);
