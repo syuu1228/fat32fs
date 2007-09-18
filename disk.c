@@ -17,5 +17,6 @@ int disk_read(int id, void *buf, unsigned offset, int count)
 		MESSAGE_ERROR_ABORT("lseek failed\n");
 	if((read(fd, buf, count)) != count)
 		MESSAGE_ERROR_ABORT("read failed\n");
+	close(fd);
 	return c;
 }

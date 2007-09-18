@@ -2,6 +2,7 @@
 #include "fat32/ldir_entry.h"
 #include "fat32/cluster_data.h"
 #include "message.h"
+#include <assert.h>
 
 static inline sector_t cluster_data_head_sector(bpb * bpb)
 {
@@ -71,12 +72,11 @@ void cluster_data_dump_dir(fat_instance * ins, const cluster_t cluster_no)
 			printf ("End\n");
 			break;
 		}
-		if (DIR_ENTRY_IS_DELETED (rootDir + i))
+		else if (DIR_ENTRY_IS_DELETED (rootDir + i))
 		{
 			printf ("Deleted entry\n");
-			continue;
 		}
-		if (DIR_ENTRY_IS_LDIR_ENTRY (rootDir + i))
+		else if (DIR_ENTRY_IS_LDIR_ENTRY (rootDir + i))
 		{
 			ldir_entry_dump ((ldir_entry *)(rootDir + i));
 		}
@@ -91,8 +91,8 @@ void cluster_data_dump_dir(fat_instance * ins, const cluster_t cluster_no)
 			}
 			if (rootDir[i].name[0] != '.'&& rootDir[i].attributes.directory)
 				cluster_data_dump_dir (ins, clus);
-			//	  else if (!rootDir[i].attributes.directory)
-			//	    cluster_data_dump (ins, clus);
+			else if (!rootDir[i].attributes.directory)
+				cluster_data_dump (ins, clus);
 		}
 	}
 }

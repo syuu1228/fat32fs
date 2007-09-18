@@ -1,5 +1,6 @@
 #include "fat32/ldir_entry.h"
 #include "string.h"
+#include <assert.h>
 
 void ldir_entry_dump(ldir_entry * ldir)
 {

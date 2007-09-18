@@ -1,6 +1,7 @@
 #include "fat32/dir_entry.h"
 #include "message.h"
 #include "string.h"
+#include <assert.h>
 
 void
 dir_entry_dump (dir_entry * dir)

@@ -1,14 +1,17 @@
 #define DISK_ID 0
 #define PARTITION_NO 0
 #include "vfs.h"
+#include "message.h"
+#include "fat32/fat_instance.h"
 #include "fat32/fat_dir.h"
 #include "fat32/fat_file.h"
+#include "string.h"
 
 static fat_instance *ins;
 
 static int fat32fs_init(vfs_config *conf)
 {
-	if(!ins = fat_instance_new(conf->disk_id, conf->partition_no))
+	if(!(ins = fat_instance_new(conf->disk_id, conf->partition_no)))
 	{
 		MESSAGE_ERROR("fat32fs initialize failed\n");
 		return -1;
@@ -33,15 +36,33 @@ static int fat32fs_opendir(vfs_fd *vfd, const char *name)
 
 static dirent *fat32fs_readdir(vfs_fd *vfd)
 {
-	static dirent;
+	static dirent d;
     fat_dir_content content;
     
 	if(!vfd->private_data)
+		return NULL;
+    if(!fat_dir_read((fat_dir *)vfd->private_data, &content))
+    	return NULL;
+    memset(&d, 0, sizeof(dirent));
+    strcpy(d.d_name, content.name);
+    d.d_reclen = strlen(content.name);
+    d.d_off = ((fat_dir *)vfd->private_data)->de_pos;
+    d.d_ino = content.cluster_no;
+    return &d;
+}
+
+static void fat32fs_seekdir(vfs_fd *vfd, off_t offset)
+{
+	if(!vfd->private_data)
 		return -1;
-    if(!fat_dir_read((fat_dir *)vfd_private_data, &content))
-    	return -1;
-    memset(&dirent, 0, sizeof(dirent));
-    return &dirent;
+	return fat_dir_seek((fat_dir *)vfd->private_data, offset);
+}
+
+static off_t fat32fs_telldir(vfs_fd *vfd)
+{
+	if(!vfd->private_data)
+		return -1;
+	return fat_dir_tell((fat_dir *)vfd->private_data);
 }
 
 static int fat32fs_closedir(vfs_fd *vfd)
@@ -64,21 +85,21 @@ static ssize_t fat32fs_read(vfs_fd *vfd, void *buf, size_t count)
 {
 	if(!vfd->private_data)
 		return -1;
-	return fat_file_read((fat_file *)vfd_private_data, buf, count);
+	return fat_file_read((fat_file *)vfd->private_data, buf, count);
 }
 
 static off_t fat32fs_lseek(vfs_fd *vfd, off_t offset, int whence)
 {
 	if(!vfd->private_data)
 		return -1;
-	return fat_file_seek((fat_file *)vfd_private_data, offset);
+	return fat_file_lseek((fat_file *)vfd->private_data, offset);
 }
 
 static int fat32fs_close(vfs_fd *vfd)
 {
 	if(!vfd->private_data)
 		return -1;
-	return fat_file_close((fat_file *)vfd_private_data);
+	return fat_file_close((fat_file *)vfd->private_data);
 }
 
 static vfs_operations fat32fs_oper = {
@@ -86,6 +107,8 @@ static vfs_operations fat32fs_oper = {
     .getattr	= fat32fs_getattr,
     .opendir	= fat32fs_opendir,
     .readdir	= fat32fs_readdir,
+    .seekdir    = fat32fs_seekdir,
+    .telldir    = fat32fs_telldir,
     .closedir	= fat32fs_closedir,
     .open		= fat32fs_open,
     .read		= fat32fs_read,
@@ -102,4 +125,5 @@ static vfs_config fat32fs_config = {
 int main(int argc, char *argv[])
 {
 	vfs_init(&fat32fs_oper, &fat32fs_config);
+	return 0;
 }

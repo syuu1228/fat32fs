@@ -1,7 +1,7 @@
 #include "fat32/cluster.h"
 #include "message.h"
 #include "string.h"
-#include "compatibility.h"
+#include <assert.h>
 
 off_t
 cluster_offset (fat_instance * ins, const cluster_t cluster_no)

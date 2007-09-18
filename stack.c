@@ -1,6 +1,7 @@
 #include "stack.h"
-#include "string.h"
+#include "./string.h"
 #include "message.h"
+#include <stdlib.h>
 
 stack *
 stack_new (const unsigned alloc)

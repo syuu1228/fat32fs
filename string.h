@@ -1,6 +1,7 @@
 #ifndef STRING_H_
 #define STRING_H_
 #include "./type.h"
+#include <string.h>
 
 #define outc putchar
 void outns(const char *str, int n);

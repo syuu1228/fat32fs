@@ -2,6 +2,7 @@
 #include "fat32/cluster.h"
 #include "fat32/fat_dir.h"
 #include "message.h"
+#include <assert.h>
 
 static inline fat_cluster_chain *fat_cluster_chain_new(cluster_t cluster_no,
 		fat_cluster_chain * prev)

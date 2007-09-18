@@ -1,6 +1,5 @@
 #include "fat32/fat_dir_content.h"
 #include "message.h"
-#include "compatibility.h"
 
 static inline int log_file_name_copy(wchar_t * wstr, ldir_entry * ldir,
 		int pos, int len)

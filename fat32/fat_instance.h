@@ -1,6 +1,6 @@
 #ifndef FAT_INSTANCE_H_
 #define FAT_INSTANCE_H_
-#include "fat32/mbr.h"
+#include "mbr.h"
 #include "fat32/bpb.h"
 #include "type.h"
 

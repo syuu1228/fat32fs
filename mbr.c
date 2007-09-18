@@ -1,6 +1,6 @@
-#include "fat32/mbr.h"
+#include "mbr.h"
 #include "message.h"
-#include "compatibility.h"
+#include <stdlib.h>
 
 mbr *mbr_read(const int fd)
 {

@@ -32,7 +32,7 @@ int vfs_opendir(const char *name)
 		vfs_fd_open(vfd);
 		return vfd->no;
 	}
-	return NULL;
+	return 0;
 }
 
 dirent *vfs_readdir(int fd)
@@ -41,11 +41,36 @@ dirent *vfs_readdir(int fd)
 	{
 		vfs_fd *vfd = vfs_fd_get(fd);
 		if(!vfd)
-			return -1;
+			return NULL;
 		return oper->readdir(vfd);
 	}
 	return NULL;
 }
+
+void vfs_seekdir(int fd, off_t offset)
+{
+	if(oper->seekdir)
+	{
+		vfs_fd *vfd = vfs_fd_get(fd);
+		if(!vfd)
+			return;
+		return oper->seekdir(vfd, offset);
+	}
+	return;
+}
+
+off_t vfs_telldir(int fd)
+{
+	if(oper->telldir)
+	{
+		vfs_fd *vfd = vfs_fd_get(fd);
+		if(!vfd)
+			return 0;
+		return oper->telldir(vfd);
+	}
+	return 0;
+}
+
 int vfs_closedir(int fd)
 {
 	if(oper->closedir)
@@ -59,6 +84,7 @@ int vfs_closedir(int fd)
 	}
 	return -1;
 }
+
 int vfs_open(const char *path, int flags, mode_t mode)
 {
 	if(oper->open)
