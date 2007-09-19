@@ -23,19 +23,21 @@ off_t cluster_data_offset(fat_instance * ins, const cluster_t cluster_no)
 	return res;
 }
 
-bool
-cluster_data_read (fat_instance * ins, const cluster_t cluster_no, void *buffer)
+ssize_t
+cluster_data_read (fat_instance * ins, const cluster_t cluster_no, void *buffer, off_t o, size_t count)
 {
 	MESSAGE_DEBUG("ins:%p clusterNo:%u buffer:%p\n", ins, cluster_no, buffer);
-	off_t offset = cluster_data_offset (ins, cluster_no);
+	assert(offset < bpb_cluster_size(&ins->bpb));
+	assert(count <  bpb_cluster_size(&ins->bpb));
+	off_t offset = cluster_data_offset (ins, cluster_no) + o;
 	if ((lseek (ins->disk_id, offset, SEEK_SET)) != offset)
 	{
 		MESSAGE_ERROR ("lseek failed\n");
 		MESSAGE_DEBUG("return:false\n");
 		return false;
 	}
-	if ((read (ins->disk_id, buffer, bpb_cluster_size (ins->bpb))) !=
-			bpb_cluster_size (ins->bpb))
+	if ((read (ins->disk_id, buffer, count)) !=
+			count)
 	{
 		MESSAGE_ERROR ("read failed\n");
 		MESSAGE_DEBUG("return:false\n");

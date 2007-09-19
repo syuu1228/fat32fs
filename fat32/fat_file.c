@@ -3,6 +3,8 @@
 #include "message.h"
 #include <assert.h>
 
+static void fat_file_next_cluster(fat_file * file);
+
 fat_file *
 fat_file_new (fat_instance * ins, fat_cluster_chain * cluster_chain)
 {
@@ -28,23 +30,31 @@ fat_file_open (fat_instance * ins, const char *name)
   return fat_file_new (ins, cluster_chain);
 }
 
-int
-fat_file_read (fat_file * file, void *buffer, size_t count)
+ssize_t
+fat_file_read (fat_file * file, void *buffer, size_t c)
 {
+  size_t count = c;
   if (file->is_reached_to_tail)
     return -1;
-  if (!cluster_data_read (file->ins, file->chain->cluster_no, buffer))
+  off_t offset = file->offset;
+  while(c >= bpb_cluster_size(&ins->bpb))
+  {
+	  if (!cluster_data_read (file->ins, file->chain->cluster_no, buffer, offset, bpb_cluster_size(&ins->bpb) - offset))
+	      return -1;
+	  buffer += bpb_cluster_size(&ins->bpb) - offset;
+	  c -= bpb_cluster_size(&ins->bpb) - offset;
+	  offset = 0;
+	  if(!fat_file_next_cluster(file))
+	  {
+		  return count - c;
+	  }
+  }
+  if(!c)
+	  return count;
+  if (!cluster_data_read (file->ins, file->chain->cluster_no, buffer, offset, c))
     return -1;
-  if (file->chain->list.next)
-    {
-      file->chain = LIST_GET (file->chain->list.next, list, fat_cluster_chain);
-      return list_count (&(file->chain->list));
-    }
-  else
-    {
-      file->is_reached_to_tail = true;
-      return 0;
-    }
+  fat_file_next_cluster(file);
+  return count;
 }
 
 bool
@@ -67,7 +77,14 @@ fat_file_cluster_seek (fat_file * file, cluster_t pos)
 
 off_t fat_file_lseek (fat_file *file, off_t offset)
 {
-	return 0;
+	if(offset >= bpb_cluster_size(&ins->bpb))
+	{
+		cluster_t coff = offset / bpb_cluster_size(&ins->bpb);
+		fat_file_cluster_seek(coff);
+		offset -= coff * bpb_cluster_size(&ins->bpb);
+	}
+	file->offset = offset;
+	return offset;
 }
 
 int 
@@ -80,4 +97,15 @@ fat_file_close (fat_file * file)
   fat_cluster_chain_delete (chain);
   free (file);
   return 0;
+}
+
+static bool fat_file_next_cluster(fat_file * file)
+{
+	fat_cluster_chain *chain = fat_cluster_chain_next(file->chain);
+	if(!chain)
+	{
+		file->is_reached_to_tail = true;
+		return false;
+	}
+	return true;
 }

@@ -6,7 +6,7 @@
 
 #define DISK_FILE_NAME "fat32test.img"
 
-int disk_read(int id, void *buf, unsigned offset, int count)
+size_t disk_read(int id, void *buf, off_t offset, size_t count)
 {
 	int c = count, fd;
 

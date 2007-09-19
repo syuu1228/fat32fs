@@ -123,3 +123,10 @@ void fat_cluster_chain_dump(const fat_cluster_chain * const chain)
 		printf ("%p\n", chain->cluster_no);
 	}
 }
+
+fat_cluster_chain *fat_cluster_chain_next(fat_cluster_chain *chain)
+{
+	if(chain->list.next)
+		return LIST_GET (chain->list.next, list, fat_cluster_chain);
+	return NULL;
+}
