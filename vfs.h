@@ -2,7 +2,6 @@
 #define VFS_H_
 #include "vfs_fd.h"
 #include "dirent.h"
-#include "type.h"
 
 typedef struct
 {
@@ -11,15 +10,8 @@ typedef struct
 } vfs_config;
 
 #define stat struct stat
-typedef struct
-  {
-    ino_t d_ino;
-    off_t d_off;
-    unsigned short int d_reclen;
-    unsigned char d_type;
-    char d_name[256];           /* We must not include limits.h! */
-  } dirent;
-  
+#define dirent struct dirent
+
 typedef struct
 {
 	int (*init)(vfs_config *conf);

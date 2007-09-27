@@ -102,7 +102,7 @@ static int fat32fs_close(vfs_fd *vfd)
 	return fat_file_close((fat_file *)vfd->private_data);
 }
 
-static vfs_operations fat32fs_oper = {
+vfs_operations fat32fs_oper = {
 	.init		= fat32fs_init,
     .getattr	= fat32fs_getattr,
     .opendir	= fat32fs_opendir,
@@ -116,14 +116,8 @@ static vfs_operations fat32fs_oper = {
     .close		= fat32fs_close
 };
 
-static vfs_config fat32fs_config = {
+vfs_config fat32fs_config = {
 		.disk_id = 0,
 		.partition_no = 0,
 		.private_config = 0
 };
-
-int main(int argc, char *argv[])
-{
-	vfs_init(&fat32fs_oper, &fat32fs_config);
-	return 0;
-}
