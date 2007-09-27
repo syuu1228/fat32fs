@@ -12,11 +12,11 @@ typedef struct
   cluster_t cluster_no;
   dir_attributes attributes;
   byte_t create_time_ms;
-  time create_time;
-  date create_date;
-  date access_date;
-  time update_time;
-  date update_date;
+  dir_entry_time create_time;
+  dir_entry_date create_date;
+  dir_entry_date access_date;
+  dir_entry_time update_time;
+  dir_entry_date update_date;
   dword_t file_size;
 } fat_dir_content;
 

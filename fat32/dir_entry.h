@@ -18,7 +18,7 @@ typedef struct
   word_t month:4;
   word_t year:7;
 }
-__attribute__ ((packed)) date;
+__attribute__ ((packed)) dir_entry_date;
 
 typedef struct
 {
@@ -26,7 +26,7 @@ typedef struct
   word_t minite:6;
   word_t hour:5;
 }
-__attribute__ ((packed)) time;
+__attribute__ ((packed)) dir_entry_time;
 
 typedef struct
 {
@@ -47,12 +47,12 @@ typedef struct
   dir_attributes attributes;
   byte_t nt_reserved;
   byte_t create_time_ms;
-  time create_time;
-  date create_date;
-  date access_date;
+  dir_entry_time create_time;
+  dir_entry_date create_date;
+  dir_entry_date access_date;
   word_t cluster_hi;
-  time update_time;
-  date update_date;
+  dir_entry_time update_time;
+  dir_entry_date update_date;
   word_t cluster_lo;
   dword_t file_size;
 }
@@ -60,8 +60,8 @@ __attribute__ ((packed)) dir_entry;
 
 void dir_entry_dump (dir_entry * dir);
 void dir_attributes_dump (dir_attributes * attributes);
-void time_dump (time * time);
-void date_dump (date * date);
+void time_dump (dir_entry_time * time);
+void date_dump (dir_entry_date * date);
 byte_t dir_entry_short_name_check_code (dir_entry * dir);
 cluster_t dir_entry_cluster (dir_entry * dir);
 

@@ -7,8 +7,8 @@ void
 dir_entry_dump (dir_entry * dir)
 {
   MESSAGE_DEBUG("dir:%p\n", dir);
-  assert (sizeof (date) == 2);
-  assert (sizeof (time) == 2);
+  assert (sizeof (dir_entry_date) == 2);
+  assert (sizeof (dir_entry_time) == 2);
   assert (sizeof (dir_attributes) == 1);
   assert (sizeof (dir_entry) == 32);
   printf ("\nname:");
@@ -48,7 +48,7 @@ dir_attributes_dump (dir_attributes * attributes)
 }
 
 void
-time_dump (time * time)
+time_dump (dir_entry_time * time)
 { 
   MESSAGE_DEBUG("time:%p\n", time);
   printf ("\thour:%u\n", time->hour);
@@ -57,7 +57,7 @@ time_dump (time * time)
 }
 
 void
-date_dump (date * date)
+date_dump (dir_entry_date * date)
 {
 	MESSAGE_DEBUG("date:%p\n", date);
   printf ("\tyear:%u\n", date->year + 1980);

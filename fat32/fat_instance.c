@@ -2,6 +2,7 @@
 #include "fat32/fat_instance.h"
 #include "mbr.h"
 #include "message.h"
+#include <stdlib.h>
 
 fat_instance *fat_instance_new(int disk_id, int partition_no)
 {

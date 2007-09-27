@@ -8,8 +8,7 @@ void ldir_entry_dump(ldir_entry * ldir)
 	assert (sizeof (lfn_sequence_number) == 1);
 	printf ("sequenceNumber:\n");
 	lfn_sequence_number_dump(&(ldir->sequence_number));
-	printf ("checkCode:");
-	printf ("%p\n", ldir->check_code);
+	printf ("checkCode:%p\n", ldir->check_code);
 	printf ("lname:");
 	outnws ((wchar_t *) ldir->name1, 5);
 	outnws ((wchar_t *) ldir->name2, 6);

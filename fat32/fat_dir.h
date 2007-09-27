@@ -8,6 +8,7 @@ typedef struct
   fat_file file;
   dir_entry *dir_entry;
   int de_pos, de_len;
+  char *name;
 } fat_dir;
 
 fat_dir *fat_dir_new (fat_instance * ins, fat_cluster_chain * cluster_chain);

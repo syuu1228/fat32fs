@@ -36,11 +36,11 @@ static inline void dir_entry_copy(fat_dir_content * content,
 	memcpy (&(content->attributes), &(dirEntry->attributes),
 			sizeof(dir_attributes));
 	content->create_time_ms = dirEntry->create_time_ms;
-	memcpy (&(content->create_time), &(dirEntry->create_time), sizeof(time));
-	memcpy (&(content->create_date), &(dirEntry->create_date), sizeof(date));
-	memcpy (&(content->access_date), &(dirEntry->access_date), sizeof(date));
-	memcpy (&(content->update_time), &(dirEntry->update_time), sizeof(time));
-	memcpy (&(content->update_date), &(dirEntry->update_date), sizeof(date));
+	memcpy (&(content->create_time), &(dirEntry->create_time), sizeof(dir_entry_time));
+	memcpy (&(content->create_date), &(dirEntry->create_date), sizeof(dir_entry_date));
+	memcpy (&(content->access_date), &(dirEntry->access_date), sizeof(dir_entry_date));
+	memcpy (&(content->update_time), &(dirEntry->update_time), sizeof(dir_entry_time));
+	memcpy (&(content->update_date), &(dirEntry->update_date), sizeof(dir_entry_date));
 	content->file_size = dirEntry->file_size;
 }
 

@@ -7,7 +7,7 @@
 static inline fat_cluster_chain *fat_cluster_chain_new(cluster_t cluster_no,
 		fat_cluster_chain * prev)
 {
-	MESSAGE_DEBUG("clusterNo:%u prev:%p\n", cluster_no, prev);
+	MESSAGE_DEBUG("cluster_no:%u prev:%p\n", cluster_no, prev);
 	fat_cluster_chain *chain =(fat_cluster_chain *) calloc (1,
 			sizeof(fat_cluster_chain));
 	if (!chain)
@@ -23,15 +23,15 @@ static inline fat_cluster_chain *fat_cluster_chain_new(cluster_t cluster_no,
 	return chain;
 }
 
-static inline bool get_next_content(fat_instance * ins, cluster_t clusterNo,
+static inline bool get_next_content(fat_instance * ins, cluster_t cluster_no,
 		const char *name, fat_dir_content * content)
 {
 	fat_cluster_chain *chain;
 	fat_dir *dir;
 	bool result;
 
-	MESSAGE_DEBUG("ins:%p clusterNo:%u name:%s content:%p\n", ins, clusterNo, name, content);
-	if (!(chain = fat_cluster_chain_get (ins, clusterNo)))
+	MESSAGE_DEBUG("ins:%p cluster_no:%u name:%s content:%p\n", ins, cluster_no, name, content);
+	if (!(chain = fat_cluster_chain_get (ins, cluster_no)))
 		return false;
 	if (!(dir = fat_dir_new (ins, chain)))
 	{

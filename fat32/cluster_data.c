@@ -27,31 +27,25 @@ ssize_t
 cluster_data_read (fat_instance * ins, const cluster_t cluster_no, void *buffer, off_t o, size_t count)
 {
 	MESSAGE_DEBUG("ins:%p clusterNo:%u buffer:%p\n", ins, cluster_no, buffer);
-	assert(offset < bpb_cluster_size(&ins->bpb));
+	assert(o < bpb_cluster_size(&ins->bpb));
 	assert(count <  bpb_cluster_size(&ins->bpb));
 	off_t offset = cluster_data_offset (ins, cluster_no) + o;
 	if ((lseek (ins->disk_id, offset, SEEK_SET)) != offset)
 	{
 		MESSAGE_ERROR ("lseek failed\n");
 		MESSAGE_DEBUG("return:false\n");
-		return false;
+		return -1;
 	}
-	if ((read (ins->disk_id, buffer, count)) !=
-			count)
-	{
-		MESSAGE_ERROR ("read failed\n");
-		MESSAGE_DEBUG("return:false\n");
-		return false;
-	}
-	MESSAGE_DEBUG("return:true\n");
-	return true;
+	ssize_t ret = read (ins->disk_id, buffer, count);
+	MESSAGE_DEBUG("return:%d\n", ret);
+	return ret;
 }
 
 void cluster_data_dump(fat_instance * ins, const cluster_t cluster_no)
 {
 	MESSAGE_DEBUG("ins:%p clusterNo:%u\n", ins, cluster_no);
 	byte_t buf[bpb_cluster_size (ins->bpb)];
-	cluster_data_read (ins, cluster_no, buf);
+	cluster_data_read (ins, cluster_no, buf, 0, bpb_cluster_size (ins->bpb));
 	printf("data:");
 	outns(buf, bpb_cluster_size (ins->bpb));
 }
@@ -60,40 +54,40 @@ extern void cluster_dump(fat_instance * ins, cluster_t cluster_no);
 void cluster_data_dump_dir(fat_instance * ins, const cluster_t cluster_no)
 {
 	MESSAGE_DEBUG("ins:%p clusterNo:%u\n", ins, cluster_no);
-	dir_entry *rootDir;
+	dir_entry *root_dir;
 	int i;
 	const int len = bpb_cluster_size (ins->bpb) / sizeof(dir_entry);
 	assert (bpb_cluster_size (ins->bpb) % sizeof (dir_entry) == 0);
-	rootDir = (dir_entry *) calloc (sizeof(dir_entry), len);
-	cluster_data_read (ins, cluster_no, (void *) rootDir);
+	root_dir = (dir_entry *) calloc (sizeof(dir_entry), len);
+	cluster_data_read (ins, cluster_no, (void *) root_dir, 0, sizeof(dir_entry));
 	for (i = 0; i < len; i++)
 	{
 		printf("[%d]\n", i);
-		if (DIR_ENTRY_IS_END (rootDir + i))
+		if (DIR_ENTRY_IS_END (root_dir + i))
 		{
 			printf ("End\n");
 			break;
 		}
-		else if (DIR_ENTRY_IS_DELETED (rootDir + i))
+		else if (DIR_ENTRY_IS_DELETED (root_dir + i))
 		{
 			printf ("Deleted entry\n");
 		}
-		else if (DIR_ENTRY_IS_LDIR_ENTRY (rootDir + i))
+		else if (DIR_ENTRY_IS_LDIR_ENTRY (root_dir + i))
 		{
-			ldir_entry_dump ((ldir_entry *)(rootDir + i));
+			ldir_entry_dump ((ldir_entry *)(root_dir + i));
 		}
 		else
 		{
-			dir_entry_dump (rootDir + i);
-			cluster_t clus = dir_entry_cluster (rootDir + i);
+			dir_entry_dump (root_dir + i);
+			cluster_t clus = dir_entry_cluster (root_dir + i);
 			if (clus)
 			{
 				printf ("cluster:");
 				cluster_dump (ins, clus);
 			}
-			if (rootDir[i].name[0] != '.'&& rootDir[i].attributes.directory)
+			if (root_dir[i].name[0] != '.'&& root_dir[i].attributes.directory)
 				cluster_data_dump_dir (ins, clus);
-			else if (!rootDir[i].attributes.directory)
+			else if (!root_dir[i].attributes.directory)
 				cluster_data_dump (ins, clus);
 		}
 	}
