@@ -5,9 +5,8 @@
 static inline sector_t bpb_root_dir_sectors(bpb * bpb)
 {
 	MESSAGE_DEBUG("bpb:%p\n", bpb);
-	sector_t
-			res =((bpb->root_entries * 32)+(bpb->bytes_per_sector - 1))
-					/ bpb->bytes_per_sector;
+	sector_t res =((bpb->root_entries * 32)+(bpb->bytes_per_sector - 1))
+			/ bpb->bytes_per_sector;
 	MESSAGE_DEBUG("return:%u\n", res);
 	return res;
 }
@@ -32,31 +31,24 @@ bool bpb_validate_cluster_no(bpb * bpb, cluster_t clusterNo)
 bool
 bpb_validate (bpb * bpb)
 {
-	return (!bpb->total_sectors16 && bpb->signature == 0xaa55);
+	if(!bpb->total_sectors16 && bpb->signature == 0xaa55)
+		return true;
+	return false;
 }
 
 bool
-bpb_read (void *ins)
+bpb_read (void *ptr)
 {
+	fat_instance *ins = (fat_instance *)ptr;
 	MESSAGE_DEBUG("ins:%p\n", ins);
-	fat_instance *fIns = (fat_instance *) ins;
-	if ((lseek
-					(fIns->disk_id,
-							fat_instance_head_offset (fIns),
-							SEEK_SET)) != fat_instance_head_offset (fIns))
-	{
-		MESSAGE_ERROR ("lseek failed\n");
-		MESSAGE_DEBUG("return:false\n");
-		return false;
-	}
-	fIns->bpb = (bpb *) calloc (1, sizeof (bpb));
-	if (!fIns->bpb)
+	ins->bpb = (bpb *) calloc (1, sizeof (bpb));
+	if (!ins->bpb)
 	{
 		MESSAGE_ERROR ("malloc failed\n");
 		MESSAGE_DEBUG("return:false\n");
 		return false;
 	}
-	if ((read (fIns->disk_id, fIns->bpb, sizeof (bpb))) != sizeof (bpb))
+	if ((disk_read (ins->disk_id, ins->bpb, fat_instance_head_offset (ins), sizeof (bpb))) != sizeof (bpb))
 	{
 		MESSAGE_ERROR ("read failed\n");
 		MESSAGE_DEBUG("return:false\n");
@@ -88,7 +80,7 @@ void bpb_dump(bpb * bpb)
 			bpb->jmp_ope_code[1], bpb->jmp_ope_code[2]);
 	printf ("OEMName:");
 	outns ((const char *) bpb->oem_name, 8);
-	printf ("BytesPerSector:%u\n", bpb->bytes_per_sector);
+	printf ("\nBytesPerSector:%u\n", bpb->bytes_per_sector);
 	printf ("SectorsPerCluster:%u\n", bpb->sectors_per_cluster);
 	printf ("ReservedSectors:%u\n", bpb->reserved_sectors);
 	printf ("NumberOfFATs:%u\n", bpb->number_of_fats);

@@ -1,6 +1,6 @@
-#Wed Sep 19 04:58:43 JST 2007
+#Sun Sep 30 01:26:20 JST 2007
 eclipse.preferences.version=1
-environment/project/cdt.managedbuild.config.gnu.exe.debug.450042513=<?xml version\="1.0" encoding\="UTF-8" standalone\="no"?>\r\n<environment append\="true">\r\n<variable delimiter\=";" name\="PATH" operation\="replace" value\="C\:\\cygwin\\bin;C\:\\cygwin\\usr\\local\\bin;C\:\\cygwin\\usr\\sbin;C\:\\cygwin\\usr\\X11R6\\bin"/>\r\n</environment>\r\n
+environment/project/cdt.managedbuild.config.gnu.exe.debug.450042513=<?xml version\="1.0" encoding\="UTF-8"?>\n<environment append\="true"/>\n
 indexer/indexerId=org.eclipse.cdt.core.domsourceindexer
 indexerId=org.eclipse.cdt.core.domsourceindexer
 instance/org.eclipse.core.net/org.eclipse.core.net.hasMigrated=true

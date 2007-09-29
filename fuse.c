@@ -1,4 +1,3 @@
-
 #define FUSE_USE_VERSION 26
 
 #ifdef HAVE_CONFIG_H
@@ -17,18 +16,18 @@
 #include <errno.h>
 #include <sys/time.h>
 #include "vfs.h"
+#include "message.h"
 
-static struct fuse_operations fuse_oper = {
-	.getattr	= fuse_getattr,
-	.opendir	= fuse_opendir,
-	.readdir	= fuse_readdir,
-	.releasedir = fuse_releasedir,
-	.open		= fuse_open,
-	.read		= fuse_read,
-	.release	= fuse_release
-};
 
-static int fuse_getattr(const char *path, struct stat *stbuf)
+extern vfs_operations fat32fs_oper;
+extern vfs_config fat32fs_config;
+
+static void *fuse_init(void)
+{
+	vfs_init(&fat32fs_oper, &fat32fs_config);
+}
+
+static int fuse_getattr(const char *path, stat *stbuf)
 {
     int res;
 
@@ -43,8 +42,11 @@ static int fuse_opendir(const char *path, struct fuse_file_info *fi)
 {
 	int fd;
     if ((fd = vfs_opendir(path)) < 0)
+    {
+    	MESSAGE_DEBUG("return:%d\n", fd);
         return fd;
-
+    }
+    
     fi->fh = fd;
     return 0;
 }
@@ -56,7 +58,7 @@ static int fuse_readdir(const char *path, void *buf, fuse_fill_dir_t filler,
 
     vfs_seekdir(fi->fh, offset);
     while ((de = readdir(fi->fh)) != NULL) {
-        struct stat st;
+        stat st;
         memset(&st, 0, sizeof(st));
         st.st_ino = de->d_ino;
         st.st_mode = de->d_type << 12;
@@ -69,7 +71,7 @@ static int fuse_readdir(const char *path, void *buf, fuse_fill_dir_t filler,
 
 static int fuse_releasedir(const char *path, struct fuse_file_info *fi)
 {
-    closedir(fi->fh);
+    vfs_closedir(fi->fh);
     return 0;
 }
 
@@ -102,11 +104,17 @@ static int fuse_release(const char *path, struct fuse_file_info *fi)
     return vfs_close(fi->fh);
 }
 
-extern vfs_operations fat32fs_oper;
-extern vfs_config fat32fs_config;
-
+static struct fuse_operations fuse_oper = {
+	.init		= fuse_init,
+	.getattr	= fuse_getattr,
+	.opendir	= fuse_opendir,
+	.readdir	= fuse_readdir,
+	.releasedir = fuse_releasedir,
+	.open		= fuse_open,
+	.read		= fuse_read,
+	.release	= fuse_release
+};
 int main(int argc, char *argv[])
 {
-	vfs_init(&fat32fs_oper, fat32fs_config);
     return fuse_main(argc, argv, &fuse_oper, NULL);
 }

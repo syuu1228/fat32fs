@@ -21,15 +21,27 @@ static int fat32fs_init(vfs_config *conf)
 
 static int fat32fs_getattr(const char *path, stat *stbuf)
 {
+	MESSAGE_DEBUG("path:%s stbuf:%p\n", path, stbuf);
+	memset(stbuf, 0, sizeof(stat));
+	if(!strcmp(path, "/")) 
+	{
+		stbuf->st_mode = S_IFDIR | 0755;
+		stbuf->st_nlink = 2;
+	}
     return 0;
 }
 
 static int fat32fs_opendir(vfs_fd *vfd, const char *name)
 {
+	MESSAGE_DEBUG("vfd:%p name:%s\n", vfd, name);
 	fat_dir *dir = fat_dir_open(ins, name);
 	if(!dir)
+	{
+		MESSAGE_DEBUG("return:-1\n");
 		return -1;
+	}
 	vfd->private_data = (void *)dir;
+	MESSAGE_DEBUG("return:0\n");
     return 0;
 }
 

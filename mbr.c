@@ -1,20 +1,15 @@
 #include "mbr.h"
 #include "message.h"
 #include <stdlib.h>
+#include "disk.h"
 
-mbr *mbr_read(const int fd)
+mbr *mbr_read(const int id)
 {
-	MESSAGE_DEBUG("fd:%d\n", fd);
+	MESSAGE_DEBUG("id:%d\n", id);
 	mbr *m = (mbr *)calloc(1, sizeof(mbr));
-	if ((lseek (fd, 0, SEEK_SET)))
+	if ((disk_read (id, m, 0, sizeof (mbr))) != sizeof (mbr))
 	{
-		MESSAGE_ERROR ("lseek failed\n");
-		free(m);
-		return NULL;
-	}
-	if ((read (fd, m, sizeof (mbr))) != sizeof (mbr))
-	{
-		MESSAGE_ERROR ("read failed\n");
+		MESSAGE_ERROR_ABORT ("read failed\n");
 		free(m);
 		return NULL;
 	}

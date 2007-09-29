@@ -10,7 +10,7 @@ typedef struct
 } vfs_config;
 
 #define stat struct stat
-#define dirent struct dirent
+typedef struct dirent dirent;
 
 typedef struct
 {
@@ -28,7 +28,7 @@ typedef struct
 } vfs_operations;
 
 int vfs_init(vfs_operations * oper, vfs_config * conf);
-int vfs_getattr(const char *path, stat *stbuf);
+int vfs_getattr(const char *path,stat *stbuf);
 int vfs_opendir(const char *name);
 dirent *vfs_readdir(int fd);
 void vfs_seekdir(int fd, off_t offset);

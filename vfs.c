@@ -1,5 +1,6 @@
 #include "vfs.h"
 #include "vfs_fd.h"
+#include "message.h"
 
 static vfs_operations *oper;
 
@@ -25,10 +26,16 @@ int vfs_opendir(const char *name)
 	{
 		vfs_fd *vfd = vfs_fd_new();
 		if(!vfd)
+		{
+			MESSAGE_DEBUG("return:-1\n");
 			return -1;
+		}
 		int ret = oper->opendir(vfd, name);
-		if(!ret)
-			return -1;
+		if(ret < 0)
+		{
+			MESSAGE_DEBUG("return:%d\n", ret);
+			return ret;
+		}
 		vfs_fd_open(vfd);
 		return vfd->no;
 	}

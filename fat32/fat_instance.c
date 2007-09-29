@@ -19,10 +19,16 @@ fat_instance *fat_instance_new(int disk_id, int partition_no)
 		free(ins);
 		return NULL;
 	}
+#ifdef DEBUG
+	mbr_dump(m);
+#endif
 	ins->disk_id = disk_id;
 	ins->partition = m->partition_table + partition_no;
 	if (!bpb_read (ins))
 		goto free_and_return;
+#ifdef DEBUG
+	bpb_dump(ins->bpb);
+#endif
 	if (!bpb_validate (ins->bpb))
 		goto free_and_return;
 	if (ins->bpb->bytes_per_sector != MBR_SECTOR_SIZE)
