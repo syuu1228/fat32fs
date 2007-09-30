@@ -56,13 +56,15 @@ static int fuse_readdir(const char *path, void *buf, fuse_fill_dir_t filler,
 {
     dirent *de;
 
+    filler(buf, ".", NULL, 0);
+    filler(buf, "..", NULL, 0);
     vfs_seekdir(fi->fh, offset);
-    while ((de = readdir(fi->fh)) != NULL) {
+    while ((de = vfs_readdir(fi->fh)) != NULL) {
         stat st;
         memset(&st, 0, sizeof(st));
         st.st_ino = de->d_ino;
         st.st_mode = de->d_type << 12;
-        if (filler(buf, de->d_name, &st, vfs_telldir(fi->fh)))
+        if (filler(buf, de->d_name, &st, 0))
             break;
     }
 
@@ -114,7 +116,40 @@ static struct fuse_operations fuse_oper = {
 	.read		= fuse_read,
 	.release	= fuse_release
 };
+
+#include "fat32/fat_instance.h"
+#include "fat32/fat_dir.h"
+#include "fat32/fat_file.h"
+void test_high_api (void)
+{
+	
+  fat_instance *ins = fat_instance_new(0, 0);
+  printf("bpb_cluster_size:%d\n", bpb_cluster_size(ins->bpb));
+  fat_dir *dir = fat_dir_open(ins, "/");
+  fat_dir_content content;
+  while (fat_dir_read (dir, &content) > 0)
+	  fat_dir_content_dump (&content);
+  fat_dir_close(dir);
+  /*
+  dir = fat_dir_open(ins, "/HOGE2");
+  while (fat_dir_read (dir, &content) > 0)
+	  fat_dir_content_dump (&content);
+  fat_dir_close(dir);
+  fat_file *file = fat_file_open(ins, "/HOGE");
+  char buf[512];
+  fat_file_read(file, buf, 512);
+  printf("/HOGE:%s\n", buf);
+  fat_file_close(file);
+  file = fat_file_open(ins, "/HOGE2/HIGE");
+  fat_file_read(file, buf, 512);
+  printf("/HOGE2/HIGE:%s\n", buf);
+  fat_file_close(file);*/
+  fat_instance_delete(ins);
+  return 0;
+}
+
 int main(int argc, char *argv[])
 {
-    return fuse_main(argc, argv, &fuse_oper, NULL);
+	test_high_api();
+    //return fuse_main(argc, argv, &fuse_oper, NULL);
 }

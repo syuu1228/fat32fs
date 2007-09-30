@@ -60,6 +60,12 @@ static dirent *fat32fs_readdir(vfs_fd *vfd)
     d.d_reclen = strlen(content.name);
     d.d_off = ((fat_dir *)vfd->private_data)->de_pos;
     d.d_ino = content.cluster_no;
+    if(content.attributes.directory)
+    	d.d_type = DT_DIR;
+    else
+    	d.d_type = DT_REG;
+    MESSAGE_DEBUG("dirent:%p ino:%d off:%u reclen:%d type:%d\n", 
+    			  &d, d.d_ino, d.d_off, d.d_reclen, d.d_type);
     return &d;
 }
 

@@ -4,6 +4,10 @@
 static vfs_fd *vfs_fd_construct(void);
 static list_node fd_list;
 
+#define VFS_FD_DUMP(vfd) \
+	MESSAGE_DEBUG("vfd:%p list:%p prev:%p next:%p using:%d offset:%u private_data:%p\n", \
+	vfd, (vfd)->list, (vfd)->list.prev, (vfd)->list.next, (vfd)->using, (vfd)->offset, (vfd)->private_data)
+
 void vfs_fd_init(void)
 {
 	MESSAGE_DEBUG("\n");
@@ -17,7 +21,8 @@ vfs_fd *vfs_fd_construct(void)
 	vfs_fd *vfd = calloc(1, sizeof(vfs_fd));
 	vfd->no = count++;
 	vfd->using = false;
-	list_insert_tail(&fd_list, &vfd->list);
+	list_insert_tail(&fd_list, &(vfd->list));
+	VFS_FD_DUMP(vfd);
 	return vfd;
 }
 
@@ -28,6 +33,7 @@ vfs_fd *vfs_fd_new(void)
 	LIST_FOR_EACH(lp)
 	{
 		vfs_fd *vfd = LIST_GET(lp, list, vfs_fd);
+		VFS_FD_DUMP(vfd);
 		if(!vfd->using)
 			return vfd;
 	}
@@ -41,6 +47,7 @@ vfs_fd *vfs_fd_get(int no)
 	LIST_FOR_EACH(lp)
 	{
 		vfs_fd *vfd = LIST_GET(lp, list, vfs_fd);
+		VFS_FD_DUMP(vfd);
 		if(vfd->no == no)
 			return vfd;
 	}
@@ -48,14 +55,14 @@ vfs_fd *vfs_fd_get(int no)
 	return NULL;
 }
 
-void vfs_fd_open(vfs_fd *fd)
+void vfs_fd_open(vfs_fd *vfd)
 {
-	MESSAGE_DEBUG("fd:%p\n", fd);
-	fd->using = true;
+	VFS_FD_DUMP(vfd);
+	vfd->using = true;
 }
 
-void vfs_fd_close(vfs_fd *fd)
+void vfs_fd_close(vfs_fd *vfd)
 {
-	MESSAGE_DEBUG("fd:%p\n", fd);
-	fd->using = false;
+	VFS_FD_DUMP(vfd);
+	vfd->using = false;
 }

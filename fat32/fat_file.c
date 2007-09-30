@@ -36,14 +36,14 @@ ssize_t fat_file_read(fat_file * file, void *buffer, size_t c)
 	if (file->is_reached_to_tail)
 		return -1;
 	off_t offset = file->offset;
-	while (c >= bpb_cluster_size(&file->ins->bpb))
+	while (c >= bpb_cluster_size(file->ins->bpb))
 	{
 		if (cluster_data_read (file->ins, file->chain->cluster_no, buffer,
-				offset, bpb_cluster_size(&file->ins->bpb) - offset)
-				!= bpb_cluster_size(&file->ins->bpb))
+				offset, bpb_cluster_size(file->ins->bpb) - offset)
+				!= bpb_cluster_size(file->ins->bpb))
 			return -1;
-		buffer += bpb_cluster_size(&file->ins->bpb) - offset;
-		c -= bpb_cluster_size(&file->ins->bpb) - offset;
+		buffer += bpb_cluster_size(file->ins->bpb) - offset;
+		c -= bpb_cluster_size(file->ins->bpb) - offset;
 		offset = 0;
 		if (!fat_file_next_cluster(file))
 		{
@@ -78,11 +78,11 @@ bool fat_file_cluster_seek(fat_file * file, cluster_t pos)
 
 off_t fat_file_lseek(fat_file *file, off_t offset)
 {
-	if (offset >= bpb_cluster_size(&file->ins->bpb))
+	if (offset >= bpb_cluster_size(file->ins->bpb))
 	{
-		cluster_t coff = offset / bpb_cluster_size(&file->ins->bpb);
+		cluster_t coff = offset / bpb_cluster_size(file->ins->bpb);
 		fat_file_cluster_seek(file, coff);
-		offset -= coff * bpb_cluster_size(&file->ins->bpb);
+		offset -= coff * bpb_cluster_size(file->ins->bpb);
 	}
 	file->offset = offset;
 	return offset;

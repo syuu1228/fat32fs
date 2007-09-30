@@ -3,17 +3,6 @@
 #include "string.h"
 #include <assert.h>
 
-static void fat_dir_get_current_dir(fat_dir *dir, fat_dir_content *content);
-static void fat_dir_get_parent_dir(fat_dir *dir, fat_dir_content *content);
-
-static inline void strip_name(char *cur, char *par)
-{
-	  int i;
-	  for(i = strlen(cur); i >= 0; i--)
-	      if(cur[i] == '/')
-		  strncpy(par, cur, i);
-}
-
 fat_dir *
 fat_dir_new (fat_instance * ins, fat_cluster_chain * cluster_chain)
 {
@@ -73,7 +62,7 @@ fat_dir_read (fat_dir * dir, fat_dir_content * content)
     fat_dir_content_get (content, dir->dir_entry, dir->de_pos, dir->de_len);
   if (dir->de_pos == -1 && dir->file.is_reached_to_tail)
     return -1;
-  return 0;
+  return 1;
 }
 
 bool
