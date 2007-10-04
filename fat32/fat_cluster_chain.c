@@ -26,6 +26,8 @@ fat_cluster_chain *fat_cluster_chain_get(fat_instance * ins,
 	MESSAGE_DEBUG("ins:%p cluster_no:%u\n", ins, cluster_no);
 	fat_cluster_chain *head, *chain;
 	cluster_t head_no = cluster_no;
+	if(!cluster_no)
+		return NULL;
 	do
 	{
 		chain = fat_cluster_chain_new (cluster_no);

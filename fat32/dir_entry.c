@@ -19,6 +19,11 @@ void
 dir_entry_dump (dir_entry * dir)
 {
   MESSAGE_DEBUG("dir:%p\n", dir);
+  if(!dir)
+  {
+	  MESSAGE_ERROR("dir_entry is nil\n");
+	  return ;
+  }
   assert (sizeof (dir_entry_date) == 2);
   assert (sizeof (dir_entry_time) == 2);
   assert (sizeof (dir_attributes) == 1);
