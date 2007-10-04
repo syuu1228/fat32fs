@@ -1,4 +1,3 @@
-#include "fat32/cluster_data.h"
 #include "fat32/fat_instance.h"
 #include "mbr.h"
 #include "message.h"
@@ -52,7 +51,6 @@ void fat_instance_dump(fat_instance * ins)
 	bpb_dump (ins->bpb);
 	bpb_cluster_size (ins->bpb);
 	bpb_count_of_clusters (ins->bpb);
-	cluster_data_dump_dir (ins, ins->bpb->root_dir_cluster);
 }
 
 off_t fat_instance_head_offset(fat_instance * ins)

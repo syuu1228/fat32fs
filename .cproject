@@ -15,7 +15,7 @@
 </extensions>
 </storageModule>
 <storageModule moduleId="cdtBuildSystem" version="4.0.0">
-<configuration artifactExtension="" artifactName="fat32fs" buildArtefactType="org.eclipse.cdt.build.core.buildArtefactType.exe" buildProperties="org.eclipse.cdt.build.core.buildArtefactType=org.eclipse.cdt.build.core.buildArtefactType.exe,org.eclipse.cdt.build.core.buildType=org.eclipse.cdt.build.core.buildType.debug" cleanCommand="rm -rf" description="" errorParsers="org.eclipse.cdt.core.MakeErrorParser;org.eclipse.cdt.core.GCCErrorParser;org.eclipse.cdt.core.GLDErrorParser;org.eclipse.cdt.core.GASErrorParser" id="cdt.managedbuild.config.gnu.exe.debug.450042513" name="Debug" parent="cdt.managedbuild.config.gnu.exe.debug" postannouncebuildStep="" postbuildStep="" preannouncebuildStep="" prebuildStep="">
+<configuration artifactExtension="" artifactName="fat32fs" buildArtefactType="org.eclipse.cdt.build.core.buildArtefactType.exe" buildProperties="org.eclipse.cdt.build.core.buildType=org.eclipse.cdt.build.core.buildType.debug,org.eclipse.cdt.build.core.buildArtefactType=org.eclipse.cdt.build.core.buildArtefactType.exe" cleanCommand="rm -rf" description="" errorParsers="org.eclipse.cdt.core.MakeErrorParser;org.eclipse.cdt.core.GCCErrorParser;org.eclipse.cdt.core.GLDErrorParser;org.eclipse.cdt.core.GASErrorParser" id="cdt.managedbuild.config.gnu.exe.debug.450042513" name="Debug" parent="cdt.managedbuild.config.gnu.exe.debug" postannouncebuildStep="" postbuildStep="" preannouncebuildStep="" prebuildStep="">
 <folderInfo id="cdt.managedbuild.config.gnu.exe.debug.450042513.1872846858" name="/" resourcePath="">
 <toolChain id="cdt.managedbuild.toolchain.gnu.exe.debug.682796725" name="GCC Tool Chain" superClass="cdt.managedbuild.toolchain.gnu.exe.debug">
 <targetPlatform id="cdt.managedbuild.target.gnu.platform.exe.debug.1631973433" name="Debug Platform" superClass="cdt.managedbuild.target.gnu.platform.exe.debug"/>
@@ -57,19 +57,21 @@
 <tool id="cdt.managedbuild.tool.gnu.archiver.base.1167039111" name="GCC Archiver" superClass="cdt.managedbuild.tool.gnu.archiver.base"/>
 </toolChain>
 </folderInfo>
-<fileInfo id="cdt.managedbuild.config.gnu.exe.debug.450042513.781695676" name="ldir_entry.c" rcbsApplicability="disable" resourcePath="fat32/ldir_entry.c" toolsToInvoke="cdt.managedbuild.tool.gnu.c.compiler.exe.debug.187895083.504958623">
-<tool id="cdt.managedbuild.tool.gnu.c.compiler.exe.debug.187895083.504958623" name="GCC C Compiler" superClass="cdt.managedbuild.tool.gnu.c.compiler.exe.debug.187895083">
-<inputType id="cdt.managedbuild.tool.gnu.c.compiler.input.874005056" superClass="cdt.managedbuild.tool.gnu.c.compiler.input"/>
-</tool>
-<tool announcement="Invoking: Resource Custom Build Step" command="" customBuildStep="true" id="org.eclipse.cdt.managedbuilder.ui.rcbs.1345282306" name="Resource Custom Build Step">
-<inputType id="org.eclipse.cdt.managedbuilder.ui.rcbs.inputtype.941308708" name="Resource Custom Build Step Input Type">
-<additionalInput kind="additionalinputdependency" paths=""/>
-</inputType>
-<outputType id="org.eclipse.cdt.managedbuilder.ui.rcbs.outputtype.767621378" name="Resource Custom Build Step Output Type" outputNames=""/>
+<fileInfo id="cdt.managedbuild.config.gnu.exe.debug.450042513.1162509077" name="fat32fs.c" rcbsApplicability="disable" resourcePath="fat32fs.c" toolsToInvoke="cdt.managedbuild.tool.gnu.c.compiler.exe.debug.187895083.379742373">
+<tool id="cdt.managedbuild.tool.gnu.c.compiler.exe.debug.187895083.379742373" name="GCC C Compiler" superClass="cdt.managedbuild.tool.gnu.c.compiler.exe.debug.187895083">
+<inputType id="cdt.managedbuild.tool.gnu.c.compiler.input.1202243411" superClass="cdt.managedbuild.tool.gnu.c.compiler.input"/>
 </tool>
 </fileInfo>
+<fileInfo id="cdt.managedbuild.config.gnu.exe.debug.450042513.1334156151" name="fuse.c" rcbsApplicability="disable" resourcePath="fuse.c" toolsToInvoke="cdt.managedbuild.tool.gnu.c.compiler.exe.debug.187895083.755127034">
+<tool id="cdt.managedbuild.tool.gnu.c.compiler.exe.debug.187895083.755127034" name="GCC C Compiler" superClass="cdt.managedbuild.tool.gnu.c.compiler.exe.debug.187895083">
+<inputType id="cdt.managedbuild.tool.gnu.c.compiler.input.1716500577" superClass="cdt.managedbuild.tool.gnu.c.compiler.input"/>
+</tool>
+</fileInfo>
+<fileInfo id="cdt.managedbuild.config.gnu.exe.debug.450042513.17912991" name="vfs.c" rcbsApplicability="disable" resourcePath="vfs.c" toolsToInvoke="cdt.managedbuild.tool.gnu.c.compiler.exe.debug.187895083.1395322253">
+<tool id="cdt.managedbuild.tool.gnu.c.compiler.exe.debug.187895083.1395322253" name="GCC C Compiler" superClass="cdt.managedbuild.tool.gnu.c.compiler.exe.debug.187895083"/>
+</fileInfo>
 <sourceEntries>
-<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name=""/>
+<entry excluding="vfs.c|fuse.c|fat32fs.c" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name=""/>
 </sourceEntries>
 </configuration>
 </storageModule>
@@ -427,7 +429,7 @@
 </extensions>
 </storageModule>
 <storageModule moduleId="cdtBuildSystem" version="4.0.0">
-<configuration artifactExtension="" artifactName="FATReader" buildArtefactType="org.eclipse.cdt.build.core.buildArtefactType.exe" buildProperties="org.eclipse.cdt.build.core.buildArtefactType=org.eclipse.cdt.build.core.buildArtefactType.exe,org.eclipse.cdt.build.core.buildType=org.eclipse.cdt.build.core.buildType.debug" cleanCommand="rm -rf" description="" errorParsers="org.eclipse.cdt.core.MakeErrorParser;org.eclipse.cdt.core.GCCErrorParser;org.eclipse.cdt.core.GLDErrorParser;org.eclipse.cdt.core.GASErrorParser" id="cdt.managedbuild.config.gnu.exe.debug.450042513.959548930" name="Release" parent="cdt.managedbuild.config.gnu.exe.debug">
+<configuration artifactExtension="" artifactName="FATReader" buildArtefactType="org.eclipse.cdt.build.core.buildArtefactType.exe" buildProperties="org.eclipse.cdt.build.core.buildType=org.eclipse.cdt.build.core.buildType.debug,org.eclipse.cdt.build.core.buildArtefactType=org.eclipse.cdt.build.core.buildArtefactType.exe" cleanCommand="rm -rf" description="" errorParsers="org.eclipse.cdt.core.MakeErrorParser;org.eclipse.cdt.core.GCCErrorParser;org.eclipse.cdt.core.GLDErrorParser;org.eclipse.cdt.core.GASErrorParser" id="cdt.managedbuild.config.gnu.exe.debug.450042513.959548930" name="Release" parent="cdt.managedbuild.config.gnu.exe.debug">
 <folderInfo id="cdt.managedbuild.config.gnu.exe.debug.450042513.959548930." name="/" resourcePath="">
 <toolChain id="cdt.managedbuild.toolchain.gnu.exe.debug.2057867066" name="GCC Tool Chain" superClass="cdt.managedbuild.toolchain.gnu.exe.debug">
 <targetPlatform id="cdt.managedbuild.target.gnu.platform.exe.debug.1448974692" name="Debug Platform" superClass="cdt.managedbuild.target.gnu.platform.exe.debug"/>

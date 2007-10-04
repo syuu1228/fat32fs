@@ -1,13 +1,12 @@
 #include "fat32/fat_cluster_chain.h"
 #include "fat32/cluster.h"
-#include "fat32/fat_dir.h"
 #include "message.h"
 #include <assert.h>
+#include <stdlib.h>
 
-static inline fat_cluster_chain *fat_cluster_chain_new(cluster_t cluster_no,
-		fat_cluster_chain * prev)
+static inline fat_cluster_chain *fat_cluster_chain_new(cluster_t cluster_no)
 {
-	MESSAGE_DEBUG("cluster_no:%u prev:%p\n", cluster_no, prev);
+	MESSAGE_DEBUG("cluster_no:%u\n", cluster_no);
 	fat_cluster_chain *chain =(fat_cluster_chain *) calloc (1,
 			sizeof(fat_cluster_chain));
 	if (!chain)
@@ -17,84 +16,31 @@ static inline fat_cluster_chain *fat_cluster_chain_new(cluster_t cluster_no,
 		return NULL;
 	}
 	chain->cluster_no = cluster_no;
-	if (prev)
-		list_insert_after (&(prev->list), &(chain->list));
 	MESSAGE_DEBUG("return:%p\n", chain);
 	return chain;
-}
-
-static inline bool get_next_content(fat_instance * ins, cluster_t cluster_no,
-		const char *name, fat_dir_content * content)
-{
-	fat_cluster_chain *chain;
-	fat_dir *dir;
-	bool result;
-
-	MESSAGE_DEBUG("ins:%p cluster_no:%u name:%s content:%p\n", ins, cluster_no, name, content);
-	if (!(chain = fat_cluster_chain_get (ins, cluster_no)))
-		return false;
-	if (!(dir = fat_dir_new (ins, chain)))
-	{
-		fat_cluster_chain_delete(chain);
-		return false;
-	}
-	result = fat_dir_find (dir, name, content);
-	fat_dir_close (dir);
-	MESSAGE_DEBUG("result:%d\n", result);
-	return result;
 }
 
 fat_cluster_chain *fat_cluster_chain_get(fat_instance * ins,
 		cluster_t cluster_no)
 {
+	MESSAGE_DEBUG("ins:%p cluster_no:%u\n", ins, cluster_no);
 	fat_cluster_chain *head, *chain;
-	MESSAGE_DEBUG("ins:%p clusterNo:%u\n", ins, cluster_no);
-	head = chain = fat_cluster_chain_new (cluster_no, NULL);
-	if (!head)
+	cluster_t head_no = cluster_no;
+	do
 	{
-		MESSAGE_DEBUG("return:NULL\n");
-		return NULL;
-	}
-	while (!cluster_is_end (ins->bpb, cluster_no)&& !cluster_is_bad (ins->bpb,
-			cluster_no))
-	{
+		chain = fat_cluster_chain_new (cluster_no);
+		if (cluster_no == head_no)
+			head = chain;
+		else
+			list_insert_tail(&head->list, &chain->list);
 		cluster_no = cluster_read (ins, cluster_no);
-		MESSAGE_DEBUG("clusterNo:%u\n", cluster_no);
-		chain = fat_cluster_chain_new (cluster_no, chain);
-	}
+	} while (!cluster_is_end (ins->bpb, cluster_no) &&!cluster_is_bad (
+			ins->bpb, cluster_no));
 #ifdef DEBUG
 	fat_cluster_chain_dump (head);
-	list_dump (&(head->list));
 #endif
 	MESSAGE_DEBUG("return:%p\n", head);
 	return head;
-}
-
-fat_cluster_chain *fat_cluster_chain_get_by_name(fat_instance * ins,
-		const char *name)
-{
-	fat_dir_content content;
-	char buf[256];
-	MESSAGE_DEBUG("ins:%p name:%s\n", ins, name);
-	if (!strcmp (name, "/"))
-		return fat_cluster_chain_get (ins, ins->bpb->root_dir_cluster);
-	memset (&content, 0, sizeof (content));
-	strncpy (buf, name, 255);
-	char *tp = strtok (buf, "/");
-	if (!get_next_content (ins, ins->bpb->root_dir_cluster, tp, &content))
-	{
-		MESSAGE_DEBUG("return:NULL\n");
-		return NULL;
-	}
-	while ((tp = strtok (NULL, "/")))
-	if (!get_next_content (ins, content.cluster_no, tp, &content))
-	{
-		MESSAGE_DEBUG("return:NULL\n");
-		return NULL;
-	}
-	fat_cluster_chain *res = fat_cluster_chain_get (ins, content.cluster_no);
-	MESSAGE_DEBUG("return:%p\n", res);
-	return res;
 }
 
 void fat_cluster_chain_delete(fat_cluster_chain * chain)
@@ -111,7 +57,14 @@ void fat_cluster_chain_delete(fat_cluster_chain * chain)
 	}
 }
 
-void fat_cluster_chain_dump(const fat_cluster_chain * const chain)
+fat_cluster_chain * fat_cluster_chain_next(fat_cluster_chain *chain)
+{
+	if (chain && chain->list.next)
+		return LIST_GET (chain->list.next, list, fat_cluster_chain);
+	return NULL;
+}
+
+void fat_cluster_chain_dump(fat_cluster_chain * chain)
 {
 	MESSAGE_DEBUG("chain:%p\n", chain);
 	list_node *lp = (list_node *) & (chain->list);
@@ -122,11 +75,4 @@ void fat_cluster_chain_dump(const fat_cluster_chain * const chain)
 		assert (chain);
 		printf ("%p\n", chain->cluster_no);
 	}
-}
-
-fat_cluster_chain *fat_cluster_chain_next(fat_cluster_chain *chain)
-{
-	if(chain->list.next)
-		return LIST_GET (chain->list.next, list, fat_cluster_chain);
-	return NULL;
 }

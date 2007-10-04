@@ -64,5 +64,5 @@ void time_dump (dir_entry_time * time);
 void date_dump (dir_entry_date * date);
 byte_t dir_entry_short_name_check_code (dir_entry * dir);
 cluster_t dir_entry_cluster (dir_entry * dir);
-
+void dir_entry_combine_short_name(dir_entry * dir, char *buf);
 #endif /*DIR_ENTRY_H_ */

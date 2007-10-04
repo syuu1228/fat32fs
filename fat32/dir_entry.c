@@ -3,6 +3,18 @@
 #include "string.h"
 #include <assert.h>
 
+static inline int sfncpy(char *dest, char *src, int len)
+{
+	int i;
+	for (i = 0; i < len; i++)
+	{
+		dest[i] = src[i];
+		if (src[i] == '\0'||src[i] == ' ')
+			break;
+	}
+	dest[i] = '\0';
+	return i;
+}
 void
 dir_entry_dump (dir_entry * dir)
 {
@@ -87,4 +99,14 @@ dir_entry_cluster (dir_entry * dir)
   ((word_t *) & res)[1] = dir->cluster_hi;
   MESSAGE_DEBUG("return:%u\n", res);
   return res;
+}
+
+void dir_entry_combine_short_name(dir_entry * dir, char *buf)
+{
+	int pos = sfncpy (buf, dir->name, 8);
+	if (dir->extension[0] != ' ')
+	{
+		buf[pos++] = '.';
+		pos = sfncpy (&(buf[pos]), dir->extension, 3);
+	}
 }

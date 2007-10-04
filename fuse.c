@@ -117,39 +117,8 @@ static struct fuse_operations fuse_oper = {
 	.release	= fuse_release
 };
 
-#include "fat32/fat_instance.h"
-#include "fat32/fat_dir.h"
-#include "fat32/fat_file.h"
-void test_high_api (void)
-{
-	
-  fat_instance *ins = fat_instance_new(0, 0);
-  printf("bpb_cluster_size:%d\n", bpb_cluster_size(ins->bpb));
-  fat_dir *dir = fat_dir_open(ins, "/");
-  fat_dir_content content;
-  while (fat_dir_read (dir, &content) > 0)
-	  fat_dir_content_dump (&content);
-  fat_dir_close(dir);
-  /*
-  dir = fat_dir_open(ins, "/HOGE2");
-  while (fat_dir_read (dir, &content) > 0)
-	  fat_dir_content_dump (&content);
-  fat_dir_close(dir);
-  fat_file *file = fat_file_open(ins, "/HOGE");
-  char buf[512];
-  fat_file_read(file, buf, 512);
-  printf("/HOGE:%s\n", buf);
-  fat_file_close(file);
-  file = fat_file_open(ins, "/HOGE2/HIGE");
-  fat_file_read(file, buf, 512);
-  printf("/HOGE2/HIGE:%s\n", buf);
-  fat_file_close(file);*/
-  fat_instance_delete(ins);
-  return 0;
-}
 
 int main(int argc, char *argv[])
 {
-	test_high_api();
-    //return fuse_main(argc, argv, &fuse_oper, NULL);
+    return fuse_main(argc, argv, &fuse_oper, NULL);
 }
