@@ -103,6 +103,8 @@ static int fuse_read(const char *path, char *buf, size_t size, off_t offset,
 
 static int fuse_release(const char *path, struct fuse_file_info *fi)
 {
+	if(!fi->fh)
+		return -1;
     return vfs_close(fi->fh);
 }
 
@@ -120,5 +122,13 @@ static struct fuse_operations fuse_oper = {
 
 int main(int argc, char *argv[])
 {
+/*	struct fuse_file_info fi;
+	fuse_init();
+	fuse_open("/HOGE", &fi);
+	printf("%d\n", fi.fh);
+	char buf[256];
+	fuse_read("/HOGE", buf, 255, 0, &fi);
+	printf("%s\n", buf);
+	fuse_release("/HOGE", &fi);*/
     return fuse_main(argc, argv, &fuse_oper, NULL);
 }

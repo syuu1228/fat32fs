@@ -17,7 +17,7 @@ typedef struct
 	int (*init)(vfs_config *conf);
 	int (*getattr)(const char *path, stat *stbuf);
 	int (*opendir)(vfs_fd *vfd, const char *name);
-	dirent *(*readdir)(vfs_fd *vfd,);
+	dirent *(*readdir)(vfs_fd *vfd);
 	void (*seekdir)(vfs_fd *vfd, off_t offset);
 	off_t (*telldir)(vfs_fd *vfd);
 	int (*closedir)(vfs_fd *vfd);

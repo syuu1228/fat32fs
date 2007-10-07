@@ -1,49 +1,47 @@
 #include "fat32/fat_dir.h"
 #include "message.h"
-#include "string.h"
+#include <string.h>
 #include <assert.h>
 
-dir_entry *fat_dir_read(fat_file * file)
+int fat_dir_read (fat_file * file, fat_dir_entry * dir)
 {
 	MESSAGE_DEBUG("file:%p\n", file);
-	static dir_entry dir;
 
 	retry:
-	if ((fat_file_read(file, &dir, sizeof(dir_entry)))
+	if ((fat_file_read(file, &(dir->dir_entry), sizeof(dir_entry)))
 			!= sizeof(dir_entry))
 	{
 		MESSAGE_DEBUG("read failed\n");
-		return NULL;
+		return -1;
 	}
-	if (DIR_ENTRY_IS_END(&dir))
+	if (DIR_ENTRY_IS_END(&(dir->dir_entry)))
 	{
 		MESSAGE_DEBUG("dir is end\n");
-		return NULL;
-	}
-	if (DIR_ENTRY_IS_DELETED(&dir) || DIR_ENTRY_IS_LDIR_ENTRY(&dir))
+		return -1;
+	}else if (DIR_ENTRY_IS_DELETED(&(dir->dir_entry)) || DIR_ENTRY_IS_LDIR_ENTRY(&(dir->dir_entry)))
 	{
 		MESSAGE_DEBUG("retrying\n");
 		goto retry;
+	}else{
+		dir_entry_combine_short_name(&(dir->dir_entry), dir->short_name);
+		
 	}
-	MESSAGE_DEBUG("return:%p\n", &dir);
-	return &dir;
+	return 0;
 }
 
-dir_entry *fat_dir_find(fat_file * file, const char *name)
+int fat_dir_find (fat_file * file, const char *name, fat_dir_entry *dir)
 {
 	MESSAGE_DEBUG("file:%p name:%s\n", file, name);
-	dir_entry *dir;
-	while (dir = fat_dir_read (file))
+	
+	while (!fat_dir_read (file, dir))
 	{
-		char short_name[13];
-		dir_entry_combine_short_name (dir, short_name);
-		if (!strncmp (short_name, name, 12))
+		if (!strncmp (dir->short_name, name, 12))
 		{
 			MESSAGE_DEBUG("%s matched with %p\n", name, dir);
-			break;
+			return 0;
 		}
 		else
-			MESSAGE_DEBUG("%s doesn't match with %s\n", name, short_name);
+			MESSAGE_DEBUG("%s doesn't match with %s\n", name, dir->short_name);
 	}
-	return dir;
+	return -1;
 }

@@ -26,8 +26,7 @@ cluster_data_read (fat_instance * ins, const cluster_t cluster_no, void *buffer,
 {
 	MESSAGE_DEBUG("ins:%p cluster_no:%u buffer:%p offset:%u\n", ins, cluster_no, buffer, o);
 	MESSAGE_DEBUG("count:%u\n", count);
-	assert(o < bpb_cluster_size(ins->bpb));
-	assert(count <  bpb_cluster_size(ins->bpb));
+	assert(o + count <=  bpb_cluster_size(ins->bpb));
 	off_t offset = cluster_data_offset (ins, cluster_no) + o;
 	ssize_t ret;
 	if((ret = disk_read (ins->disk_id, buffer, offset, count)) != count)

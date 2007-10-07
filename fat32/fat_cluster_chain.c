@@ -47,16 +47,18 @@ fat_cluster_chain *fat_cluster_chain_get(fat_instance * ins,
 
 void fat_cluster_chain_delete(fat_cluster_chain * chain)
 {
-	list_node iterator;
+	list_node *i;
 	MESSAGE_DEBUG("chain:%p\n", chain);
-	list_node_copy (&iterator, &(chain->list));
-	while (iterator.next)
-	{
-		chain = LIST_GET (iterator.next, list, fat_cluster_chain);
+	fat_cluster_chain_dump(chain);
+	list_dump(&(chain->list));
+	i = &(chain->list);
+	do 
+	{ 
+		chain = LIST_GET (i, list, fat_cluster_chain);
 		assert (chain);
-		list_node_copy (&iterator, &(chain->list));
+		i = chain->list.next;
 		free (chain);
-	}
+	} while(i);
 }
 
 fat_cluster_chain * fat_cluster_chain_next(fat_cluster_chain *chain)
@@ -75,6 +77,6 @@ void fat_cluster_chain_dump(fat_cluster_chain * chain)
 		printf("%p:", lp);
 		fat_cluster_chain *chain = LIST_GET (lp, list, fat_cluster_chain);
 		assert (chain);
-		printf ("%p\n", chain->cluster_no);
+		printf ("%d\n", chain->cluster_no);
 	}
 }

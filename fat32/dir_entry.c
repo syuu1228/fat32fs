@@ -96,7 +96,7 @@ dir_entry_short_name_check_code (dir_entry * dir)
 }
 
 cluster_t
-dir_entry_cluster (dir_entry * dir)
+dir_entry_get_cluster (dir_entry * dir)
 {
   MESSAGE_DEBUG("dir:%p\n", dir);
   cluster_t res;

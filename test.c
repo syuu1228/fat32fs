@@ -79,32 +79,39 @@ void test_read_dir_by_fat_file(void)
 		  dir_entry_dump(dir);
 }*/
 #include "fat32/fat_path.h"
-/*void test_find_dir()
+#include <assert.h>
+void test_find_dir()
 {
 	fat_instance *ins = fat_instance_new(0, 0);
 	fat_cluster_chain *chain = fat_cluster_chain_get(ins, 2);
 	fat_file *file = fat_file_new(ins, chain);
-//	dir_entry *dir = fat_dir_find(file, "YAMS-1~1.PDF");
-//	dir_entry_dump(dir);
-	dir_entry_dump(fat_path_get_dir_entry(ins, "/HOGE2/HIGE"));
-}*/
+	fat_dir_entry dir;
+	assert(!fat_dir_find(file, "YAMS-1~1.PDF", &dir));
+	dir_entry_dump(&dir.dir_entry);
+	assert(!fat_path_get_entry(ins, "/HOGE2/HIGE", &dir));
+	dir_entry_dump(&dir.dir_entry);
+}
+
+
+
 #include <assert.h>
-       #include <sys/types.h>
-       #include <sys/stat.h>
-       #include <fcntl.h>
-
-
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <fcntl.h>
 void test_read_file()
 {
 
-	char buf[1024];
+	char buf[1025];
 	fat_instance *ins = fat_instance_new(0, 0);
-	dir_entry *ent = fat_path_get_dir_entry(ins, "/YAMS-1~1.PDF");
-	dir_entry_dump(ent);
+	fat_dir_entry dir;
+	if(fat_path_get_entry(ins, "/YAMS-1~1.PDF", &dir) < 0)
+		return -1;
+	dir_entry_dump(&dir.dir_entry);
 	fat_file *file = fat_file_open(ins, "/YAMS-1~1.PDF");
 	assert(file);
-	dword_t cnt = ent->file_size;
+	dword_t cnt = dir.dir_entry.file_size;
 	int fd = open("/tmp/yams.pdf", O_CREAT | O_RDWR);
+	assert(fd > 0);
 	while(cnt >= 1024)
 	{
 		assert(fat_file_read(file, buf, 1024) == 1024);
@@ -119,12 +126,13 @@ void test_read_file()
 	fat_file_close(file);
 	close(fd);
 }
+
 int main(int argc, char *argv[])
 {
 //	test_read_dir();
 //	test_read_dir_by_fat_file();
 //	test_read_dir_by_fat_dir();
-//	test_find_dir();
+	test_find_dir();
 	test_read_file();
 //	test_high_api();
     //return fuse_main(argc, argv, &fuse_oper, NULL);

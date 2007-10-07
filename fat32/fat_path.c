@@ -3,7 +3,9 @@
 #include "fat32/fat_dir.h"
 #include "message.h"
 
-static inline char * pathtok(const char *p)
+static char * pathtok(const char *p);
+
+char * pathtok(const char *p)
 {
 	static int start, end;
 	static char *path, buf[256];
@@ -26,40 +28,44 @@ static inline char * pathtok(const char *p)
 	return NULL;
 }
 
-dir_entry *fat_path_get_dir_entry(fat_instance *ins, const char *path)
+int fat_path_get_entry(fat_instance *ins, const char *path, fat_dir_entry *dir)
 {
 	fat_cluster_chain *chain;
 	char *name;
-	dir_entry *dir;
 	cluster_t cluster_no;
 	
-	if(!strcmp("/", path))
-		return NULL;
-	
 	cluster_no = ins->bpb->root_dir_cluster;
+	if(!strcmp("/", path))
+	{
+		memset(dir, 0, sizeof(fat_dir_entry));
+		dir->dir_entry.attributes.directory = 1;
+		dir->dir_entry.cluster_lo = cluster_no;
+		dir->short_name[0] = '/';
+		return 0;
+	}
 	pathtok(path);
 	while((name = pathtok(NULL)))
 	{
 		MESSAGE_DEBUG("name:%s\n", name);
 		chain = fat_cluster_chain_get(ins, cluster_no);
 		fat_file *file = fat_file_new(ins, chain);
-		if(!(dir = fat_dir_find(file, name)))
+		if(fat_dir_find(file, name, dir) < 0)
 		{
 			fat_file_close(file);
-			return NULL;
+			return -1;
 		}
-		cluster_no = dir_entry_cluster(dir);
+		cluster_no = dir_entry_get_cluster(&dir->dir_entry);
 		fat_file_close(file);
 	}
-	return dir;
+	return 0;
 }
 
 fat_cluster_chain *fat_path_get_cluster(fat_instance *ins, const char *path)
 {
 	if(!strcmp("/", path))
-		return ins->bpb->root_dir_cluster;
-	dir_entry *dir = fat_path_get_dir_entry(ins, path);
-	if(!dir)
+		return fat_cluster_chain_get(ins, ins->bpb->root_dir_cluster);
+	fat_dir_entry dir;
+	if(fat_path_get_entry(ins, path, &dir) < 0)
 		return NULL;
-	return fat_cluster_chain_get(ins, dir_entry_cluster(dir));
+	return fat_cluster_chain_get(ins, dir_entry_get_cluster(&dir.dir_entry));
 }
