@@ -30,7 +30,6 @@ char * pathtok(const char *p)
 
 int fat_path_get_entry(fat_instance *ins, const char *path, fat_dir_entry *dir)
 {
-	fat_cluster_chain *chain;
 	char *name;
 	cluster_t cluster_no;
 	
@@ -47,8 +46,15 @@ int fat_path_get_entry(fat_instance *ins, const char *path, fat_dir_entry *dir)
 	while((name = pathtok(NULL)))
 	{
 		MESSAGE_DEBUG("name:%s\n", name);
-		chain = fat_cluster_chain_get(ins, cluster_no);
-		fat_file *file = fat_file_new(ins, chain);
+		fat_cluster_list* list = fat_cluster_list_open(ins, cluster_no);
+		if(!list)
+			return -1;
+		fat_file *file = fat_file_new(ins, list);
+		if(!file)
+		{
+			fat_cluster_list_close(list);
+			return -1;
+		}
 		if(fat_dir_find(file, name, dir) < 0)
 		{
 			fat_file_close(file);
@@ -60,12 +66,12 @@ int fat_path_get_entry(fat_instance *ins, const char *path, fat_dir_entry *dir)
 	return 0;
 }
 
-fat_cluster_chain *fat_path_get_cluster(fat_instance *ins, const char *path)
+fat_cluster_list *fat_path_get_cluster(fat_instance *ins, const char *path)
 {
 	if(!strcmp("/", path))
-		return fat_cluster_chain_get(ins, ins->bpb->root_dir_cluster);
+		return fat_cluster_list_open(ins, ins->bpb->root_dir_cluster);
 	fat_dir_entry dir;
 	if(fat_path_get_entry(ins, path, &dir) < 0)
 		return NULL;
-	return fat_cluster_chain_get(ins, dir_entry_get_cluster(&dir.dir_entry));
+	return fat_cluster_list_open(ins, dir_entry_get_cluster(&dir.dir_entry));
 }

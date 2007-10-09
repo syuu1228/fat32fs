@@ -27,43 +27,17 @@ dword_t cluster_read(fat_instance * ins, const cluster_t cluster_no)
 	return extent;
 }
 
-bool
-cluster_is_bad (bpb * bpb, const dword_t extent)
-{
-	MESSAGE_DEBUG("bpb:%p extent:%u\n", bpb, extent);
-	bool res;
-	if (extent == 0x0ffffff7)
-	res = true;
-	else
-	res = false;
-	MESSAGE_DEBUG("return:%d\n", res);
-	return res;
-}
-
-bool
-cluster_is_end (bpb * bpb, const dword_t extent)
-{
-	MESSAGE_DEBUG("bpb:%p extent:%u\n", bpb, extent);
-	bool res;
-	if (extent >= 0x0ffffff8 && extent <= 0x0fffffff)
-	res = true;
-	else
-	res = false;
-	MESSAGE_DEBUG("return:%d\n", res);
-	return res;
-}
-
 void cluster_dump(fat_instance * ins, const cluster_t cluster_no)
 {
 	MESSAGE_DEBUG("ins:%p clusterNo:%u\n", ins, cluster_no);
 	dword_t extent = cluster_read (ins, cluster_no);
 	printf ("%u->", cluster_no);
-	if (cluster_is_bad (ins->bpb, extent))
+	if (IS_BAD_CLUSTER (extent))
 	{
 		printf ("bad\n");
 		return;
 	}
-	else if (cluster_is_end (ins->bpb, extent))
+	else if (IS_END_OF_CLUSTER (extent))
 	{
 		printf("end\n");
 		return;
