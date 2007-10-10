@@ -9,6 +9,8 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <fcntl.h>
+#include <stdio.h>
+#include "message.h"
 
 void test_read_dir_by_fat_file(void)
 {
@@ -94,26 +96,33 @@ void test_read_file()
 	fat_file *file = fat_file_open(ins, "/YAMS-1~1.PDF");
 	assert(file);
 	dword_t cnt = dir.dir_entry.file_size;
-	int fd = open("/tmp/yams.pdf", O_CREAT | O_RDWR);
-	assert(fd > 0);
+	FILE *fp = fopen("/tmp/yams.pdf", "w");
+	assert(fp);
 	while(cnt >= 1024)
 	{
+		size_t res;
 		assert(fat_file_read(file, buf, 1024) == 1024);
-		assert(write(fd, buf, 1024) == 1024);
+		res = fwrite(buf, 1024, 1, fp);
+		MESSAGE_DEBUG("res:%u\n", res);
+//		assert(res == 1024);
 		cnt -= 1024;
 	}
 	if(cnt)
 	{
 		assert(fat_file_read(file, buf, cnt) == cnt);
-		assert(write(fd, buf, cnt) == cnt);
+		assert(fwrite(buf, cnt, 1, fp) == cnt);
 	}
 	fat_file_close(file);
 	fat_instance_delete(ins);
-	close(fd);
+	fclose(fp);
 }
 
 int main(int argc, char *argv[])
 {
+/*	fat_instance *ins = fat_instance_new(0, 0);
+	fat_file *file = fat_file_open(ins, "/YAMS-1~1.PDF");
+	fat_file_close(file);
+	fat_instance_delete(ins);*/
 	test_read_dir_by_fat_file();
 	test_read_dir_by_fat_dir();
 	test_find_dir();

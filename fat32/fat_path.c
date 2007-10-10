@@ -73,5 +73,5 @@ fat_cluster_list *fat_path_get_cluster(fat_instance *ins, const char *path)
 	fat_dir_entry dir;
 	if(fat_path_get_entry(ins, path, &dir) < 0)
 		return NULL;
-	return fat_cluster_list_open(ins, dir_entry_get_cluster(&dir.dir_entry));
+	return fat_cluster_list_open(ins, dir_entry_get_cluster(&(dir.dir_entry)));
 }
