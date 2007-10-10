@@ -2,9 +2,9 @@
 #include "message.h"
 #include <assert.h>
 
-static fat_cluster_list *fat_cluster_list_new(fat_instance * ins, dword_t size);
+static fat_cluster_list *fat_cluster_list_new(fat_instance * ins, int size);
 
-fat_cluster_list *fat_cluster_list_new(fat_instance * ins, dword_t size)
+fat_cluster_list *fat_cluster_list_new(fat_instance * ins, int size)
 {
 	MESSAGE_DEBUG("\n");
 	fat_cluster_list *list =(fat_cluster_list *) calloc (1, sizeof(fat_cluster_list));
@@ -14,19 +14,42 @@ fat_cluster_list *fat_cluster_list_new(fat_instance * ins, dword_t size)
 		MESSAGE_DEBUG ("return:NULL\n");
 		return NULL;
 	}
-	list->clusters = calloc((size / bpb_cluster_size(ins->bpb)) + 2, sizeof(cluster_t));
+	list->clusters = calloc(size, sizeof(cluster_t));
 	if(!list->clusters)
 	{
 		free(list);
 		MESSAGE_ERROR("malloc error\n");
 		return NULL;
 	}
-	list->length = (size / bpb_cluster_size(ins->bpb)) + 2;
+	list->length = size;
 	MESSAGE_DEBUG("return:%p\n", list);
 	return list;
 }
 
-fat_cluster_list *fat_cluster_list_open(fat_instance * ins, cluster_t head, dword_t size)
+int fat_cluster_list_calculate_size_from_cluster_no(fat_instance * ins,
+		cluster_t cluster_no)
+{
+	if (!cluster_no)
+		return 0;
+	assert(!IS_END_OF_CLUSTER(cluster_no) && !IS_BAD_CLUSTER(cluster_no));
+	int i = 1;
+	do
+	{
+		cluster_no = cluster_read(ins, cluster_no);
+		assert(!IS_BAD_CLUSTER(cluster_no));
+		i++;
+	} while (!IS_END_OF_CLUSTER(cluster_no));
+	return i;
+}
+
+int fat_cluster_list_calculate_size_from_fat_dir_entry(fat_instance * ins,
+		fat_dir_entry *dir)
+{
+	return dir->dir_entry.file_size / bpb_cluster_size(ins->bpb) + 2;
+}
+
+fat_cluster_list *fat_cluster_list_open(fat_instance * ins, cluster_t head,
+		int size)
 {
 	MESSAGE_DEBUG("ins:%p head:%u\n", ins, head);
 	fat_cluster_list *list = fat_cluster_list_new(ins, size);
@@ -34,30 +57,19 @@ fat_cluster_list *fat_cluster_list_open(fat_instance * ins, cluster_t head, dwor
 		return list;
 	cluster_t cluster_no = head;
 	list->clusters[0] = head;
-	if(!head)
+	if (!head)
 		return list;
 	MESSAGE_DEBUG("list->clusters[%x] = %x\n", 0, head);
 	list->offset = 1;
 	do
 	{
-/*		if (list->offset == list->length - 1)
-		{
-			list->clusters = realloc(list->clusters, list->length * 2);
-			if (!list->clusters)
-			{
-				MESSAGE_ERROR("realloc error\n");
-				free(list);
-				return NULL;
-			}
-			list->length *= 2;
-			MESSAGE_DEBUG("reallocated as %u\n", list->length);
-		}*/
 		assert(list->offset < list->length);
 		cluster_no = cluster_read(ins, cluster_no);
+		assert(!IS_BAD_CLUSTER(cluster_no));
 		list->clusters[list->offset++] = cluster_no;
 		MESSAGE_DEBUG("list->clusters[%x] = %x\n", list->offset - 1, cluster_no);
 		fat_cluster_list_dump(list);
-	} while (!IS_END_OF_CLUSTER(cluster_no) && !IS_BAD_CLUSTER(cluster_no));
+	} while (!IS_END_OF_CLUSTER(cluster_no));
 	list->end = list->offset;
 	list->offset = 0;
 	return list;
@@ -84,11 +96,18 @@ int fat_cluster_list_tell(fat_cluster_list *list)
 	return list->offset;
 }
 
-int fat_cluster_list_seek(fat_cluster_list *list, int offset)
+int fat_cluster_list_seek_set(fat_cluster_list *list, int offset)
 {
 	if (offset >= list->end)
 		return -1;
 	return list->offset = offset;
+}
+
+int fat_cluster_list_seek_cur(fat_cluster_list *list, int offset)
+{
+	if (list->offset + offset >= list->end)
+		return -1;
+	return list->offset += offset;
 }
 
 int fat_cluster_list_size(fat_cluster_list *list)

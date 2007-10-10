@@ -42,7 +42,7 @@ ssize_t fat_file_read(fat_file * file, void *buffer, size_t c)
 		c -= res;
 		if (res != bpb_cluster_size(file->ins->bpb))
 		{
-			file->offset += res;
+			fat_file_seek_cur(file, res);
 			return count - c;
 		}
 		buffer += res;
@@ -54,7 +54,7 @@ ssize_t fat_file_read(fat_file * file, void *buffer, size_t c)
 	if (!c)
 		return count;
 	ssize_t res = cluster_data_read (file->ins, fat_cluster_list_read(file->cluster), buffer, offset, c);
-	file->offset += res;
+	fat_file_seek_cur(file, res);
 	if (res != c - offset)
 		return res;
 	assert(c - res == 0);
@@ -64,15 +64,31 @@ ssize_t fat_file_read(fat_file * file, void *buffer, size_t c)
 	return count;
 }
 
-off_t fat_file_lseek(fat_file *file, off_t o)
+off_t fat_file_seek_set(fat_file *file, off_t o)
 {
 	off_t offset = o;
 	MESSAGE_DEBUG("file:%p offset:%u\n", file, o);
 	if (o >= bpb_cluster_size(file->ins->bpb))
 	{
-		cluster_t coff = offset / bpb_cluster_size(file->ins->bpb);
-		if(fat_cluster_list_seek(file->cluster, coff) != coff)
-			return offset - o;
+		cluster_t coff = o / bpb_cluster_size(file->ins->bpb);
+		if(fat_cluster_list_seek_set(file->cluster, coff) < 0)
+			return 0;
+		o -= coff * bpb_cluster_size(file->ins->bpb);
+	}
+	file->offset = o;
+	return offset;
+}
+
+off_t fat_file_seek_cur(fat_file *file, off_t o)
+{
+	off_t offset = o;
+	MESSAGE_DEBUG("file:%p offset:%u\n", file, o);
+	o += file->offset;
+	if(o >= bpb_cluster_size(file->ins->bpb))
+	{
+		cluster_t coff = o / bpb_cluster_size(file->ins->bpb);
+		if(fat_cluster_list_seek_cur(file->cluster, coff) < 0)
+			return 0;
 		o -= coff * bpb_cluster_size(file->ins->bpb);
 	}
 	file->offset = o;

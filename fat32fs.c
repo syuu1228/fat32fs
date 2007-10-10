@@ -73,7 +73,7 @@ static dirent *fat32fs_readdir(vfs_fd *vfd) {
 static void fat32fs_seekdir(vfs_fd *vfd, off_t offset) {
 	if (!vfd->private_data)
 		return -1;
-	return fat_file_lseek((fat_file *)vfd->private_data, offset);
+	return fat_file_seek_set((fat_file *)vfd->private_data, offset);
 }
 
 static off_t fat32fs_telldir(vfs_fd *vfd) {
@@ -105,7 +105,7 @@ static ssize_t fat32fs_read(vfs_fd *vfd, void *buf, size_t count) {
 static off_t fat32fs_lseek(vfs_fd *vfd, off_t offset, int whence) {
 	if (!vfd->private_data)
 		return -1;
-	return fat_file_lseek((fat_file *)vfd->private_data, offset);
+	return fat_file_seek_set((fat_file *)vfd->private_data, offset);
 }
 
 static int fat32fs_close(vfs_fd *vfd) {
