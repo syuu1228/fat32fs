@@ -1,6 +1,7 @@
 #include "fat32/cluster_data.h"
 #include "message.h"
 #include <assert.h>
+#include "fat32/cluster.h"
 
 static inline sector_t cluster_data_head_sector(bpb * bpb)
 {
@@ -13,6 +14,7 @@ static inline sector_t cluster_data_head_sector(bpb * bpb)
 
 off_t cluster_data_offset(fat_instance * ins, const cluster_t cluster_no)
 {
+	assert(!IS_END_OF_CLUSTER(cluster_no) && !IS_BAD_CLUSTER(cluster_no));
 	MESSAGE_DEBUG("ins:%p clusterNo:%u\n", ins, cluster_no);
 	off_t res = fat_instance_sector_to_offset (ins,
 			cluster_data_head_sector (ins->bpb)+ bpb_cluster_to_sector (
@@ -24,8 +26,11 @@ off_t cluster_data_offset(fat_instance * ins, const cluster_t cluster_no)
 ssize_t
 cluster_data_read (fat_instance * ins, const cluster_t cluster_no, void *buffer, off_t o, size_t count)
 {
+	assert(!IS_BAD_CLUSTER(cluster_no));
 	MESSAGE_DEBUG("ins:%p cluster_no:%u buffer:%p offset:%u\n", ins, cluster_no, buffer, o);
 	MESSAGE_DEBUG("count:%u\n", count);
+	if(IS_END_OF_CLUSTER(cluster_no))
+		return 0;
 	assert(o + count <=  bpb_cluster_size(ins->bpb));
 	off_t offset = cluster_data_offset (ins, cluster_no) + o;
 	ssize_t ret;

@@ -7,14 +7,14 @@
 
 typedef struct {
 	cluster_t *clusters;
-	int offset, length;
+	int offset, length, end;
 } fat_cluster_list;
 
-fat_cluster_list *fat_cluster_list_open(fat_instance * ins, cluster_t head);
+fat_cluster_list *fat_cluster_list_open(fat_instance * ins, cluster_t head, dword_t size);
 cluster_t fat_cluster_list_read(fat_cluster_list *list);
 int fat_cluster_list_tell(fat_cluster_list *list);
 int fat_cluster_list_seek(fat_cluster_list *list, int offset);
-int fat_cluster_list_length(fat_cluster_list *list);
+int fat_cluster_list_size(fat_cluster_list *list);
 void fat_cluster_list_close(fat_cluster_list * list);
 void fat_cluster_list_dump(fat_cluster_list * list);
 #endif /*FAT_CLUSTER_LIST_H_*/

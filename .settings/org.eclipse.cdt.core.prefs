@@ -1,6 +1,10 @@
-#Sun Sep 30 01:26:20 JST 2007
+#Thu Oct 11 03:17:05 JST 2007
 eclipse.preferences.version=1
 environment/project/cdt.managedbuild.config.gnu.exe.debug.450042513=<?xml version\="1.0" encoding\="UTF-8"?>\n<environment append\="true"/>\n
+indexer/filesToParseUpFront=
+indexer/indexAllFiles=true
 indexer/indexerId=org.eclipse.cdt.core.domsourceindexer
+indexer/skipReferences=false
+indexer/skipTypeReferences=false
 indexerId=org.eclipse.cdt.core.domsourceindexer
 instance/org.eclipse.core.net/org.eclipse.core.net.hasMigrated=true

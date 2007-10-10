@@ -100,7 +100,7 @@ int vfs_open(const char *path, int flags, mode_t mode)
 		if(!vfd)
 			return -1;
 		int ret = oper->open(vfd, path, flags, mode);
-		if(!ret)
+		if(ret < 0)
 			return -1;
 		vfs_fd_open(vfd);
 		return vfd->no;

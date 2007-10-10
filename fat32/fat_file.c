@@ -32,10 +32,8 @@ ssize_t fat_file_read(fat_file * file, void *buffer, size_t c)
 {
 	MESSAGE_DEBUG("file:%p buffer:%p count:%u\n", file, buffer, c);
 	size_t count = c;
+	cluster_t cluster_no;
 	off_t offset = file->offset;
-
-	if(IS_END_OF_CLUSTER(fat_cluster_list_read(file->cluster)))
-		return 0;
 	
 	while (c >= bpb_cluster_size(file->ins->bpb))
 	{
@@ -55,7 +53,6 @@ ssize_t fat_file_read(fat_file * file, void *buffer, size_t c)
 	
 	if (!c)
 		return count;
-	
 	ssize_t res = cluster_data_read (file->ins, fat_cluster_list_read(file->cluster), buffer, offset, c);
 	file->offset += res;
 	if (res != c - offset)

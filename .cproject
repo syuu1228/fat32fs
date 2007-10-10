@@ -27,6 +27,7 @@
 <tool id="cdt.managedbuild.tool.gnu.c.compiler.exe.debug.187895083" name="GCC C Compiler" superClass="cdt.managedbuild.tool.gnu.c.compiler.exe.debug">
 <option id="gnu.c.compiler.option.preprocessor.def.symbols.1947986527" name="Defined symbols (-D)" superClass="gnu.c.compiler.option.preprocessor.def.symbols" valueType="definedSymbols">
 <listOptionValue builtIn="false" value="DEBUG"/>
+<listOptionValue builtIn="false" value="_FORTIFY_SOURCE=2"/>
 <listOptionValue builtIn="false" value="_FILE_OFFSET_BITS=64"/>
 <listOptionValue builtIn="false" value="_REENTRANT"/>
 </option>
@@ -34,7 +35,7 @@
 <option id="gnu.c.compiler.option.include.paths.1812744921" name="Include paths (-I)" superClass="gnu.c.compiler.option.include.paths" valueType="includePath">
 <listOptionValue builtIn="false" value="&quot;${workspace_loc:/fat32fs}&quot;"/>
 </option>
-<option defaultValue="gnu.c.optimization.level.none" id="gnu.c.compiler.exe.debug.option.optimization.level.1639757607" name="Optimization Level" superClass="gnu.c.compiler.exe.debug.option.optimization.level" valueType="enumerated"/>
+<option defaultValue="gnu.c.optimization.level.none" id="gnu.c.compiler.exe.debug.option.optimization.level.1639757607" name="Optimization Level" superClass="gnu.c.compiler.exe.debug.option.optimization.level" value="gnu.c.optimization.level.optimize" valueType="enumerated"/>
 <option id="gnu.c.compiler.exe.debug.option.debugging.level.1881534799" name="Debug Level" superClass="gnu.c.compiler.exe.debug.option.debugging.level" value="gnu.c.debugging.level.max" valueType="enumerated"/>
 <inputType id="cdt.managedbuild.tool.gnu.c.compiler.input.1397459430" superClass="cdt.managedbuild.tool.gnu.c.compiler.input"/>
 </tool>
@@ -44,7 +45,6 @@
 <option id="gnu.c.link.option.ldflags.1877149256" name="Linker flags" superClass="gnu.c.link.option.ldflags" value="-m32" valueType="string"/>
 <option id="gnu.c.link.option.libs.1201049690" name="Libraries (-l)" superClass="gnu.c.link.option.libs" valueType="libs">
 <listOptionValue builtIn="false" value="fuse"/>
-<listOptionValue builtIn="false" value="yamd-dynamic"/>
 </option>
 <inputType id="cdt.managedbuild.tool.gnu.c.linker.input.991527790" superClass="cdt.managedbuild.tool.gnu.c.linker.input">
 <additionalInput kind="additionalinputdependency" paths="$(USER_OBJS)"/>
@@ -79,7 +79,7 @@
 </tool>
 </fileInfo>
 <sourceEntries>
-<entry excluding="fuse.c|fat32/fat_cluster_chain_old.h|fat32/fat_cluster_chain_old.c" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name=""/>
+<entry excluding="test.c|fat32/fat_cluster_chain_old.h|fat32/fat_cluster_chain_old.c" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name=""/>
 </sourceEntries>
 </configuration>
 </storageModule>
@@ -420,6 +420,7 @@
 </profile>
 </scannerConfigBuildInfo>
 </storageModule>
+
 <storageModule moduleId="org.eclipse.cdt.core.language.mapping">
 <project-mappings/>
 </storageModule>
@@ -819,6 +820,7 @@
 </profile>
 </scannerConfigBuildInfo>
 </storageModule>
+
 <storageModule moduleId="org.eclipse.cdt.core.language.mapping">
 <project-mappings/>
 </storageModule>

@@ -17,7 +17,7 @@ void test_read_dir_by_fat_file(void)
 	  fat_instance *ins = fat_instance_new(0, 0);
 	  assert(ins);
 	  dir_entry dent;
-	  fat_cluster_list *list = fat_cluster_list_open(ins, 2);
+	  fat_cluster_list *list = fat_cluster_list_open(ins, 2, 512 * 128);
 	  assert(list);
 	  fat_cluster_list_dump(list);
 	  fat_file *file = fat_file_new(ins, list);
@@ -48,7 +48,7 @@ void test_read_dir_by_fat_file(void)
 				  printf("unallocated file\n");
 				  continue;
 			  }
-			  fat_cluster_list *list = fat_cluster_list_open(ins, cluster_no);
+			  fat_cluster_list *list = fat_cluster_list_open(ins, cluster_no, dent.file_size);
 			  fat_cluster_list_dump(list);
 			  fat_cluster_list_close(list);
 		  }
@@ -61,7 +61,7 @@ void test_read_dir_by_fat_dir(void)
 {
 	  fat_instance *ins = fat_instance_new(0, 0);
 	  assert(ins);
-	  fat_cluster_list *list = fat_cluster_list_open(ins, 2);
+	  fat_cluster_list *list = fat_cluster_list_open(ins, 2, 512 * 128);
 	  assert(list);
 	  fat_file *file = fat_file_new(ins, list);
 	  assert(file);
@@ -75,7 +75,7 @@ void test_read_dir_by_fat_dir(void)
 void test_find_dir()
 {
 	fat_instance *ins = fat_instance_new(0, 0);
-	fat_cluster_list *list = fat_cluster_list_open(ins, 2);
+	fat_cluster_list *list = fat_cluster_list_open(ins, 2, 512 * 128);
 	fat_file *file = fat_file_new(ins, list);
 	fat_dir_entry dir;
 	assert(!fat_dir_find(file, "YAMS-1~1.PDF", &dir));
@@ -100,17 +100,14 @@ void test_read_file()
 	assert(fp);
 	while(cnt >= 1024)
 	{
-		size_t res;
 		assert(fat_file_read(file, buf, 1024) == 1024);
-		res = fwrite(buf, 1024, 1, fp);
-		MESSAGE_DEBUG("res:%u\n", res);
-//		assert(res == 1024);
+		assert(fwrite(buf, 1024, 1, fp) == 1);
 		cnt -= 1024;
 	}
 	if(cnt)
 	{
 		assert(fat_file_read(file, buf, cnt) == cnt);
-		assert(fwrite(buf, cnt, 1, fp) == cnt);
+		assert(fwrite(buf, cnt, 1, fp) == 1);
 	}
 	fat_file_close(file);
 	fat_instance_delete(ins);
