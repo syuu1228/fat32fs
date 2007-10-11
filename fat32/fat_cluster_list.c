@@ -3,6 +3,12 @@
 #include <assert.h>
 
 static fat_cluster_list *fat_cluster_list_new(fat_instance * ins, int size);
+static int fat_cluster_list_calculate_size_from_cluster_no(fat_instance * ins,
+		cluster_t cluster_no);
+static int fat_cluster_list_calculate_size_from_fat_dir_entry(
+		fat_instance * ins, fat_dir_entry *dir);
+static fat_cluster_list *fat_cluster_list_open(fat_instance * ins,
+		cluster_t head, int size);
 
 fat_cluster_list *fat_cluster_list_new(fat_instance * ins, int size)
 {
@@ -68,11 +74,34 @@ fat_cluster_list *fat_cluster_list_open(fat_instance * ins, cluster_t head,
 		assert(!IS_BAD_CLUSTER(cluster_no));
 		list->clusters[list->offset++] = cluster_no;
 		MESSAGE_DEBUG("list->clusters[%x] = %x\n", list->offset - 1, cluster_no);
+#ifdef DEBUG
 		fat_cluster_list_dump(list);
+#endif
 	} while (!IS_END_OF_CLUSTER(cluster_no));
 	list->end = list->offset;
 	list->offset = 0;
 	return list;
+}
+
+fat_cluster_list *fat_cluster_list_open_by_cluster_no(fat_instance * ins,
+		cluster_t cluster_no)
+{
+	return fat_cluster_list_open(ins, cluster_no,
+			fat_cluster_list_calculate_size_from_cluster_no(ins, cluster_no));
+}
+
+fat_cluster_list *fat_cluster_list_open_by_fat_dir_entry(fat_instance * ins,
+		fat_dir_entry *dir)
+{
+	cluster_t cluster_no = dir_entry_get_cluster(&(dir->dir_entry));
+	if (dir->dir_entry.attributes.directory)
+		return fat_cluster_list_open(
+				ins,
+				cluster_no,
+				fat_cluster_list_calculate_size_from_cluster_no(ins, cluster_no));
+	else
+		return fat_cluster_list_open(ins, cluster_no,
+				fat_cluster_list_calculate_size_from_fat_dir_entry(ins, dir));
 }
 
 cluster_t fat_cluster_list_read(fat_cluster_list *list)

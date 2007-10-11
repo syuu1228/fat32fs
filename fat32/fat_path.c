@@ -30,37 +30,31 @@ char * pathtok(const char *p)
 int fat_path_get_entry(fat_instance *ins, const char *path, fat_dir_entry *dir)
 {
 	char *name;
-	cluster_t cluster_no;
-
-	cluster_no = ins->bpb->root_dir_cluster;
+	bool root_dir = true;
+	
 	if (!strcmp("/", path))
 	{
 		memset(dir, 0, sizeof(fat_dir_entry));
 		dir->dir_entry.attributes.directory = 1;
-		dir->dir_entry.cluster_lo = cluster_no;
+		dir->dir_entry.cluster_lo = ins->bpb->root_dir_cluster;
 		return 0;
 	}
 	pathtok(path);
 	while ((name = pathtok(NULL)))
 	{
-		fat_cluster_list* list;
+		fat_cluster_list *list;
+		fat_file *file;
 		MESSAGE_DEBUG("name:%s\n", name);
-		if (cluster_no == ins->bpb->root_dir_cluster)
+		if (root_dir)
 		{
-			list = fat_cluster_list_open(ins, ins->bpb->root_dir_cluster,
-					fat_cluster_list_calculate_size_from_cluster_no(ins,
-							ins->bpb->root_dir_cluster));
-		}
-		else
-		{
-			fat_cluster_list_open(ins, cluster_no,
-					fat_cluster_list_calculate_size_from_fat_dir_entry(ins,
-							&dir));
-		}
+			list = fat_cluster_list_open_by_cluster_no(ins, ins->bpb->root_dir_cluster);
+			root_dir = false;
+		}else
+			list = fat_cluster_list_open_by_fat_dir_entry(ins, dir);
 
 		if (!list)
 			return -1;
-		fat_file *file = fat_file_new(ins, list);
+		file = fat_file_new(ins, list);
 		if (!file)
 		{
 			fat_cluster_list_close(list);
@@ -71,7 +65,6 @@ int fat_path_get_entry(fat_instance *ins, const char *path, fat_dir_entry *dir)
 			fat_file_close(file);
 			return -1;
 		}
-		cluster_no = dir_entry_get_cluster(&dir->dir_entry);
 		fat_file_close(file);
 	}
 	return 0;
@@ -79,15 +72,10 @@ int fat_path_get_entry(fat_instance *ins, const char *path, fat_dir_entry *dir)
 
 fat_cluster_list *fat_path_get_cluster(fat_instance *ins, const char *path)
 {
-	if (!strcmp("/", path))
-	{
-		return fat_cluster_list_open(ins, ins->bpb->root_dir_cluster,
-				fat_cluster_list_calculate_size_from_cluster_no(ins,
-						ins->bpb->root_dir_cluster));
-	}
 	fat_dir_entry dir;
+	if (!strcmp("/", path))
+		return fat_cluster_list_open_by_cluster_no(ins, ins->bpb->root_dir_cluster);
 	if (fat_path_get_entry(ins, path, &dir) < 0)
 		return NULL;
-	return fat_cluster_list_open(ins, dir_entry_get_cluster(&(dir.dir_entry)),
-			fat_cluster_list_calculate_size_from_fat_dir_entry(ins, &dir));
+	return fat_cluster_list_open_by_fat_dir_entry(ins, &dir);
 }

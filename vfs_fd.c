@@ -22,7 +22,9 @@ vfs_fd *vfs_fd_construct(void)
 	vfd->no = count++;
 	vfd->using = false;
 	list_insert_tail(&fd_list, &(vfd->list));
+#ifdef DEBUG
 	VFS_FD_DUMP(vfd);
+#endif
 	return vfd;
 }
 
@@ -33,7 +35,9 @@ vfs_fd *vfs_fd_new(void)
 	LIST_FOR_EACH(lp)
 	{
 		vfs_fd *vfd = LIST_GET(lp, list, vfs_fd);
+#ifdef DEBUG
 		VFS_FD_DUMP(vfd);
+#endif
 		if(!vfd->using)
 			return vfd;
 	}
@@ -47,7 +51,9 @@ vfs_fd *vfs_fd_get(int no)
 	LIST_FOR_EACH(lp)
 	{
 		vfs_fd *vfd = LIST_GET(lp, list, vfs_fd);
+#ifdef DEBUG
 		VFS_FD_DUMP(vfd);
+#endif
 		if(vfd->no == no)
 			return vfd;
 	}
@@ -57,12 +63,16 @@ vfs_fd *vfs_fd_get(int no)
 
 void vfs_fd_open(vfs_fd *vfd)
 {
+#ifdef DEBUG
 	VFS_FD_DUMP(vfd);
+#endif
 	vfd->using = true;
 }
 
 void vfs_fd_close(vfs_fd *vfd)
 {
+#ifdef DEBUG
 	VFS_FD_DUMP(vfd);
+#endif
 	vfd->using = false;
 }
